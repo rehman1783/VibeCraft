@@ -36,13 +36,13 @@ Future<void> main() async {
     remoteDataSource: authRemoteDataSource,
   );
 
-  runApp(WallZenApp(authRepository: authRepository));
+  runApp(VibeCraftApp(authRepository: authRepository));
 }
 
-class WallZenApp extends StatelessWidget {
+class VibeCraftApp extends StatelessWidget {
   final AuthRepository authRepository;
 
-  const WallZenApp({super.key, required this.authRepository});
+  const VibeCraftApp({super.key, required this.authRepository});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class WallZenApp extends StatelessWidget {
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, themeMode) {
             return MaterialApp(
-              title: 'WallZen',
+              title: 'VibeCraft',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,

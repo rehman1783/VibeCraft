@@ -1,4 +1,4 @@
-# WallZen Navigation & UI Implementation ✅
+# VibeCraft Navigation & UI Implementation ✅
 
 ## Phase 1: Core Navigation Infrastructure ✅
 - [x] Create NavigationCubit (`lib/features/navigation/presentation/cubit/navigation_cubit.dart`)

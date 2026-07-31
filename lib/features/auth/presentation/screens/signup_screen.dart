@@ -150,7 +150,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const AuthHeader(
                         title: 'CREATE ACCOUNT',
                         subtitle:
-                            'Join WallZen to unlock full AI creation capabilities',
+                            'Join VibeCraft to unlock full AI creation capabilities',
                       ),
                       const SizedBox(height: 32),
                       VibeTextField(

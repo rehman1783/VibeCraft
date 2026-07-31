@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'WALLZEN',
+                'VibeCraft',
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 28,

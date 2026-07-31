@@ -53,9 +53,9 @@ class DefaultFirebaseOptions {
     apiKey: 'AIzaSyCgjIbGaE7g5c_HpKjdN3g3baV95BpJsYM',
     appId: '1:56650199153:web:d0978b1e66244e02b3ebd0',
     messagingSenderId: '56650199153',
-    projectId: 'wallzen-889d8',
-    authDomain: 'wallzen-889d8.firebaseapp.com',
-    storageBucket: 'wallzen-889d8.firebasestorage.app',
+    projectId: 'VibeCraft-889d8',
+    authDomain: 'VibeCraft-889d8.firebaseapp.com',
+    storageBucket: 'VibeCraft-889d8.firebasestorage.app',
     measurementId: 'G-2SVSZ5X764',
   );
 

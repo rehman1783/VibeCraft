@@ -21,26 +21,30 @@ class UnsplashWallpaperModel extends WallpaperEntity {
     final user = json['user'] as Map<String, dynamic>? ?? {};
     final links = json['links'] as Map<String, dynamic>? ?? {};
 
-    final thumbUrl = urls['small'] as String? ??
+    final thumbUrl =
+        urls['small'] as String? ??
         urls['thumb'] as String? ??
         urls['regular'] as String? ??
         '';
 
-    final regularUrl = urls['regular'] as String? ??
+    final regularUrl =
+        urls['regular'] as String? ??
         urls['full'] as String? ??
         urls['small'] as String? ??
         '';
 
     final rawUrl = urls['raw'] as String? ?? regularUrl;
 
-    final photographer = user['name'] as String? ??
+    final photographer =
+        user['name'] as String? ??
         user['username'] as String? ??
         'Unsplash Artist';
     final photographerUsername = user['username'] as String? ?? '';
 
-    final description = json['description'] as String? ??
+    final description =
+        json['description'] as String? ??
         json['alt_description'] as String? ??
-        'WallZen Wallpaper';
+        'VibeCraft Wallpaper';
 
     final downloadLoc = links['download_location'] as String? ?? '';
 

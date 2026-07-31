@@ -15,7 +15,7 @@ abstract class WallpaperLocalDataSource {
 class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
   final SharedPreferences sharedPreferences;
   final Dio dio;
-  static const String _downloadedKey = 'WALLZEN_DOWNLOADED_WALLPAPERS';
+  static const String _downloadedKey = 'VibeCraft_DOWNLOADED_WALLPAPERS';
   static const int _maxStorageCapBytes = 100 * 1024 * 1024; // 100 MB Limit
 
   WallpaperLocalDataSourceImpl({
@@ -35,7 +35,7 @@ class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
   @override
   Future<String> saveWallpaperToStorage(WallpaperEntity wallpaper) async {
     final wallDir = await _getWallpapersDirectory();
-    final fileName = 'wallzen_${wallpaper.id}.jpg';
+    final fileName = 'VibeCraft_${wallpaper.id}.jpg';
     final filePath = '${wallDir.path}/$fileName';
     final file = File(filePath);
 
@@ -52,7 +52,9 @@ class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
 
     // Persist wallpaper entity metadata locally
     final existingList = await getDownloadedWallpapers();
-    final updatedList = existingList.where((w) => w.id != wallpaper.id).toList();
+    final updatedList = existingList
+        .where((w) => w.id != wallpaper.id)
+        .toList();
 
     final savedEntity = WallpaperEntity(
       id: wallpaper.id,
@@ -72,7 +74,9 @@ class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
     // Newest download inserted at top
     updatedList.insert(0, savedEntity);
 
-    final jsonList = updatedList.map((item) => jsonEncode(item.toJson())).toList();
+    final jsonList = updatedList
+        .map((item) => jsonEncode(item.toJson()))
+        .toList();
     await sharedPreferences.setStringList(_downloadedKey, jsonList);
 
     // Enforce 100MB auto-pruning (FIFO)
@@ -85,9 +89,12 @@ class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
   Future<List<WallpaperEntity>> getDownloadedWallpapers() async {
     final jsonList = sharedPreferences.getStringList(_downloadedKey) ?? [];
     final list = jsonList
-        .map((str) => WallpaperEntity.fromJson(jsonDecode(str) as Map<String, dynamic>))
+        .map(
+          (str) =>
+              WallpaperEntity.fromJson(jsonDecode(str) as Map<String, dynamic>),
+        )
         .toList();
-    
+
     // Filter out files that might have been manually removed
     return list.where((w) {
       if (!w.highResUrl.startsWith('http')) {

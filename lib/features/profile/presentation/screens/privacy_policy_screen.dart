@@ -66,7 +66,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'WallZen Privacy Policy & Terms',
+                            'VibeCraft Privacy Policy & Terms',
                             style: TextStyle(
                               color: textPrimary,
                               fontSize: 18,
@@ -93,7 +93,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _buildSection(
                 title: '1. Minimal Data Collection',
                 body:
-                    'WallZen respects user privacy. We collect minimal account data (display name and email address) exclusively when you authenticate via Firebase Authentication. We do not track location, device contacts, or sell personal data to third parties.',
+                    'VibeCraft respects user privacy. We collect minimal account data (display name and email address) exclusively when you authenticate via Firebase Authentication. We do not track location, device contacts, or sell personal data to third parties.',
                 textPrimary: textPrimary,
                 textSecondary: textSecondary,
                 surface: surface,
@@ -105,7 +105,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _buildSection(
                 title: '2. App-Private Storage Policy (Zero Gallery Access)',
                 body:
-                    'All downloaded wallpapers are saved strictly inside the app\'s isolated private document directory. WallZen does NOT request, read, or export data to your device\'s public media gallery or external photos library, guaranteeing zero photo library pollution.',
+                    'All downloaded wallpapers are saved strictly inside the app\'s isolated private document directory. VibeCraft does NOT request, read, or export data to your device\'s public media gallery or external photos library, guaranteeing zero photo library pollution.',
                 textPrimary: textPrimary,
                 textSecondary: textSecondary,
                 surface: surface,
@@ -117,7 +117,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _buildSection(
                 title: '3. Third-Party Integrations & Services',
                 body:
-                    'WallZen integrates with trusted third-party providers:\n'
+                    'VibeCraft integrates with trusted third-party providers:\n'
                     '• Unsplash REST API: Used to fetch high-resolution wallpaper imagery and report download telemetry per Unsplash API Guidelines.\n'
                     '• Firebase (Auth & Firestore): Used for secure authentication and cross-device favorites synchronization.',
                 textPrimary: textPrimary,
@@ -131,7 +131,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _buildSection(
                 title: '4. Local Cache & 100MB Storage Cap',
                 body:
-                    'To optimize device performance, WallZen enforces an automatic 100 MB local storage cap for downloaded wallpapers (First-In, First-Out auto-pruning). Users may also perform a full data wipe at any time via "Clear Cache" in Profile settings.',
+                    'To optimize device performance, VibeCraft enforces an automatic 100 MB local storage cap for downloaded wallpapers (First-In, First-Out auto-pruning). Users may also perform a full data wipe at any time via "Clear Cache" in Profile settings.',
                 textPrimary: textPrimary,
                 textSecondary: textSecondary,
                 surface: surface,

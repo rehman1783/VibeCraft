@@ -9,7 +9,7 @@ abstract class SearchLocalDataSource {
 
 class SearchLocalDataSourceImpl implements SearchLocalDataSource {
   final SharedPreferences sharedPreferences;
-  static const String _recentSearchesKey = 'WALLZEN_RECENT_SEARCHES';
+  static const String _recentSearchesKey = 'VibeCraft_RECENT_SEARCHES';
 
   SearchLocalDataSourceImpl({required this.sharedPreferences});
 

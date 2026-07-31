@@ -48,7 +48,7 @@ class DeleteAccountDialog extends StatelessWidget {
         ],
       ),
       content: Text(
-        'Are you sure you want to delete your account? This action is permanent and will delete your profile document, stored settings, and saved data from WallZen.',
+        'Are you sure you want to delete your account? This action is permanent and will delete your profile document, stored settings, and saved data from VibeCraft.',
         style: TextStyle(color: bodyColor, fontSize: 14, height: 1.4),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -72,7 +72,7 @@ class HomeTopHeader extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'WallZen',
+                'VibeCraft',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,

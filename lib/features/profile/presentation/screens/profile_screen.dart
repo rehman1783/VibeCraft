@@ -42,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'Logout',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: const Text('Are you sure you want to log out of WallZen?'),
+        content: const Text('Are you sure you want to log out of VibeCraft?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),

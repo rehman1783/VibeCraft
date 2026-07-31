@@ -13,8 +13,8 @@ abstract class FavoritesLocalDataSource {
 
 class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   final SharedPreferences sharedPreferences;
-  static const String _favoritesKey = 'WALLZEN_FAVORITE_WALLPAPERS';
-  static const String _downloadedKey = 'WALLZEN_DOWNLOADED_WALLPAPERS';
+  static const String _favoritesKey = 'VibeCraft_FAVORITE_WALLPAPERS';
+  static const String _downloadedKey = 'VibeCraft_DOWNLOADED_WALLPAPERS';
 
   FavoritesLocalDataSourceImpl({required this.sharedPreferences});
 

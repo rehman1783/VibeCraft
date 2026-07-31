@@ -105,7 +105,7 @@ class MockSearchLocalDataSource implements SearchLocalDataSource {
 }
 
 void main() {
-  testWidgets('WallZen app renders splash screen on launch', (
+  testWidgets('VibeCraft app renders splash screen on launch', (
     WidgetTester tester,
   ) async {
     final mockAuthRepo = MockAuthRepository();
@@ -126,7 +126,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
-          title: 'WallZen',
+          title: 'VibeCraft',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkTheme,
           initialRoute: AppRoutes.splash,
@@ -135,7 +135,7 @@ void main() {
       ),
     );
 
-    expect(find.text('WALLZEN'), findsOneWidget);
+    expect(find.text('VibeCraft'), findsOneWidget);
     await tester.pumpAndSettle();
     expect(find.text('WELCOME BACK'), findsOneWidget);
   });

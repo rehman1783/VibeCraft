@@ -1,4 +1,4 @@
-name: WallZen Build APK
+name: VibeCraft Build APK
 on:
   pull_request:
     branches:

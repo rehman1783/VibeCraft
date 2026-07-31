@@ -6,10 +6,33 @@ class LockScreenSimulator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final timeStr = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    final dateStr = "${days[(now.weekday - 1) % 7]}, ${months[(now.month - 1) % 12]} ${now.day}";
+    final timeStr =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    final dateStr =
+        "${days[(now.weekday - 1) % 7]}, ${months[(now.month - 1) % 12]} ${now.day}";
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -54,7 +77,11 @@ class LockScreenSimulator extends StatelessWidget {
                     fontSize: 72,
                     letterSpacing: -2,
                     shadows: const [
-                      Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4)),
+                      Shadow(
+                        color: Colors.black45,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
                     ],
                   ),
                 ),
@@ -71,7 +98,11 @@ class LockScreenSimulator extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.8,
                     shadows: const [
-                      Shadow(color: Colors.black45, blurRadius: 6, offset: Offset(0, 2)),
+                      Shadow(
+                        color: Colors.black45,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
                     ],
                   ),
                 ),
@@ -85,7 +116,9 @@ class LockScreenSimulator extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.15),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -95,7 +128,11 @@ class LockScreenSimulator extends StatelessWidget {
                         color: Colors.indigoAccent,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 18),
+                      child: const Icon(
+                        Icons.wallpaper_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -106,7 +143,7 @@ class LockScreenSimulator extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'WallZen',
+                                'VibeCraft',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,

@@ -52,7 +52,8 @@ class WallpaperEntity {
       rawUrl: json['rawUrl'] as String? ?? '',
       photographer: json['photographer'] as String? ?? 'Unsplash Artist',
       photographerUsername: json['photographerUsername'] as String? ?? '',
-      altDescription: json['altDescription'] as String? ?? 'WallZen Wallpaper',
+      altDescription:
+          json['altDescription'] as String? ?? 'VibeCraft Wallpaper',
       downloadLocation: json['downloadLocation'] as String? ?? '',
       color: json['color'] as String?,
       likes: (json['likes'] as num?)?.toInt() ?? 0,
