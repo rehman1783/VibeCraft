@@ -1,0 +1,241 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entities/wallpaper_entity.dart';
+import '../../domain/repositories/wallpaper_repository.dart';
+import '../../../search/data/datasources/search_local_data_source.dart';
+import 'wallpaper_state.dart';
+
+class WallpaperCubit extends Cubit<WallpaperState> {
+  final WallpaperRepository repository;
+  final SearchLocalDataSource searchLocalDataSource;
+
+  WallpaperCubit({
+    required this.repository,
+    required this.searchLocalDataSource,
+  }) : super(const WallpaperState()) {
+    loadRecentSearches();
+  }
+
+  Future<void> loadRecentSearches() async {
+    try {
+      final recent = await searchLocalDataSource.getRecentSearches();
+      emit(state.copyWith(recentSearches: recent));
+    } catch (_) {}
+  }
+
+  Future<void> loadTopics() async {
+    try {
+      final topics = await repository.getTopics();
+      emit(state.copyWith(topics: topics));
+    } catch (_) {}
+  }
+
+  Future<void> fetchWallpapers({bool isRefresh = false}) async {
+    if (!isRefresh && (state.status == WallpaperStatus.loading || state.hasReachedMax)) {
+      return;
+    }
+
+    final targetPage = isRefresh ? 1 : state.page;
+    final currentList = isRefresh ? <WallpaperEntity>[] : state.wallpapers;
+
+    emit(state.copyWith(
+      status: WallpaperStatus.loading,
+      page: targetPage,
+      wallpapers: currentList,
+      hasReachedMax: isRefresh ? false : state.hasReachedMax,
+    ));
+
+    try {
+      List<WallpaperEntity> newWallpapers = [];
+
+      final query = state.currentQuery;
+      final category = state.selectedCategory;
+      final orientation = state.selectedOrientation;
+      final color = state.selectedColor;
+      final sortBy = state.selectedSort;
+
+      if (query != null && query.isNotEmpty) {
+        newWallpapers = await repository.searchWallpapers(
+          query: query,
+          page: targetPage,
+          orderBy: sortBy,
+          orientation: orientation,
+          color: color,
+        );
+      } else if (category != null && category.isNotEmpty) {
+        final categoryQuery = (category == '3D') ? '3D wallpapers' : category;
+        newWallpapers = await repository.searchWallpapers(
+          query: categoryQuery,
+          page: targetPage,
+          orderBy: sortBy,
+          orientation: orientation,
+          color: color,
+        );
+      } else {
+        if ((orientation != null && orientation.isNotEmpty) ||
+            (color != null && color.isNotEmpty)) {
+          newWallpapers = await repository.searchWallpapers(
+            query: 'wallpapers',
+            page: targetPage,
+            orderBy: sortBy,
+            orientation: orientation,
+            color: color,
+          );
+        } else {
+          newWallpapers = await repository.getCuratedWallpapers(
+            page: targetPage,
+            orderBy: sortBy,
+          );
+        }
+      }
+
+      final updatedList = List<WallpaperEntity>.from(currentList)..addAll(newWallpapers);
+
+      emit(state.copyWith(
+        status: WallpaperStatus.loaded,
+        wallpapers: updatedList,
+        page: targetPage + 1,
+        hasReachedMax: newWallpapers.isEmpty,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: WallpaperStatus.failure,
+        errorMessage: 'No Internet Connection. Please check your network and try again.',
+      ));
+    }
+  }
+
+  Future<void> searchWallpapers(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      emit(state.copyWith(clearQuery: true));
+    } else {
+      await searchLocalDataSource.saveSearchQuery(trimmed);
+      await loadRecentSearches();
+      emit(state.copyWith(currentQuery: trimmed, clearCategory: true));
+    }
+    await fetchWallpapers(isRefresh: true);
+  }
+
+  Future<void> removeRecentSearch(String query) async {
+    await searchLocalDataSource.removeSearchQuery(query);
+    await loadRecentSearches();
+  }
+
+  Future<void> clearRecentSearches() async {
+    await searchLocalDataSource.clearRecentSearches();
+    await loadRecentSearches();
+  }
+
+  Future<void> selectCategory(String? category) async {
+    if (category == null || category == 'All') {
+      emit(state.copyWith(clearCategory: true, clearQuery: true));
+    } else if (state.selectedCategory == category) {
+      emit(state.copyWith(clearCategory: true));
+    } else {
+      emit(state.copyWith(selectedCategory: category, clearQuery: true));
+    }
+    await fetchWallpapers(isRefresh: true);
+  }
+
+  Future<void> applyFilters({
+    String? orientation,
+    String? color,
+    String? sortBy,
+  }) async {
+    emit(state.copyWith(
+      selectedOrientation: orientation,
+      clearOrientation: orientation == null,
+      selectedColor: color,
+      clearColor: color == null,
+      selectedSort: sortBy ?? state.selectedSort,
+    ));
+    await fetchWallpapers(isRefresh: true);
+  }
+
+  Future<void> clearFilters() async {
+    emit(state.copyWith(
+      clearOrientation: true,
+      clearColor: true,
+      selectedSort: 'popular',
+    ));
+    await fetchWallpapers(isRefresh: true);
+  }
+
+  Future<void> downloadWallpaper(WallpaperEntity wallpaper) async {
+    final updatedDownloadingIds = Set<String>.from(state.downloadingIds)..add(wallpaper.id);
+    emit(state.copyWith(
+      downloadStatus: WallpaperDownloadStatus.downloading,
+      downloadingIds: updatedDownloadingIds,
+      clearLastDownloadedId: true,
+      clearLastFailedId: true,
+      errorMessage: null,
+    ));
+
+    try {
+      final savedPath = await repository.downloadWallpaper(wallpaper);
+      await loadDownloadedWallpapers();
+      final finishedDownloadingIds = Set<String>.from(state.downloadingIds)..remove(wallpaper.id);
+      emit(state.copyWith(
+        downloadStatus: WallpaperDownloadStatus.downloaded,
+        downloadingIds: finishedDownloadingIds,
+        lastDownloadedId: wallpaper.id,
+        downloadedFilePath: savedPath,
+      ));
+    } catch (e) {
+      final finishedDownloadingIds = Set<String>.from(state.downloadingIds)..remove(wallpaper.id);
+      emit(state.copyWith(
+        downloadStatus: WallpaperDownloadStatus.failure,
+        downloadingIds: finishedDownloadingIds,
+        lastFailedId: wallpaper.id,
+        errorMessage: 'Download failed: No Internet Connection. Please check your network and try again.',
+      ));
+    }
+  }
+
+  Future<void> applyWallpaperToDevice({
+    required String imagePathOrUrl,
+    required WallpaperTarget target,
+  }) async {
+    emit(state.copyWith(applyStatus: WallpaperApplyStatus.applying));
+    try {
+      final success = await repository.applyWallpaper(
+        imagePathOrUrl: imagePathOrUrl,
+        target: target,
+      );
+      if (success) {
+        emit(state.copyWith(applyStatus: WallpaperApplyStatus.success));
+      } else {
+        emit(state.copyWith(
+          applyStatus: WallpaperApplyStatus.failure,
+          errorMessage: 'Could not set wallpaper on this device.',
+        ));
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        applyStatus: WallpaperApplyStatus.failure,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> loadDownloadedWallpapers() async {
+    try {
+      final downloaded = await repository.getDownloadedWallpapers();
+      emit(state.copyWith(downloadedWallpapers: downloaded));
+    } catch (_) {}
+  }
+
+  Future<bool> checkIfDownloaded(String wallpaperId) async {
+    return await repository.isWallpaperDownloaded(wallpaperId);
+  }
+
+  void resetDownloadAndApplyStatus() {
+    emit(state.copyWith(
+      downloadStatus: WallpaperDownloadStatus.initial,
+      applyStatus: WallpaperApplyStatus.initial,
+      clearLastDownloadedId: true,
+      clearLastFailedId: true,
+      downloadedFilePath: null,
+    ));
+  }
+}

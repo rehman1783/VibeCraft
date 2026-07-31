@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "56650199153",
+    "project_id": "wallzen-889d8",
+    "storage_bucket": "wallzen-889d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56650199153:android:7bc8acb01fe46007b3ebd0",
+        "android_client_info": {
+          "package_name": "com.wallzen.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56650199153-3po85q2je56nftut38nkanaqn27out6i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzZO_0YR7QJ2URCT0u3ScfGDh7luPv698"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56650199153-3po85q2je56nftut38nkanaqn27out6i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
