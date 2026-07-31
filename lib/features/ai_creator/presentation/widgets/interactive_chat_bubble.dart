@@ -66,7 +66,7 @@ class InteractiveChatBubble extends StatelessWidget {
                 width: 225,
                 child: VibeButton(
                   label: "✨ Create Wallpaper",
-                  icon: Icons.auto_awesome_rounded,
+                  // icon: Icons.auto_awesome_rounded,
                   onPressed: () => onGenerateTap(message.optimizedPrompt!),
                 ),
               ),
