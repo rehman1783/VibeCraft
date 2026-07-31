@@ -217,9 +217,46 @@ class ProfileCubit extends Cubit<ProfileState> {
         await _firestore.collection('users').doc(uid).delete();
       } catch (_) {}
 
-      // 2. Remove local photo path
+      // 2. Clear all local storage (RAM image cache, temp files, app documents, and SharedPreferences)
+      try {
+        PaintingBinding.instance.imageCache.clear();
+        PaintingBinding.instance.imageCache.clearLiveImages();
+      } catch (_) {}
+
+      try {
+        final tempDir = await getTemporaryDirectory();
+        if (await tempDir.exists()) {
+          final tempFiles = tempDir.listSync();
+          for (final entity in tempFiles) {
+            try {
+              if (entity is File) {
+                await entity.delete();
+              } else if (entity is Directory) {
+                await entity.delete(recursive: true);
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
+
+      try {
+        final appDir = await getApplicationDocumentsDirectory();
+        if (await appDir.exists()) {
+          final appEntities = appDir.listSync();
+          for (final entity in appEntities) {
+            try {
+              if (entity is File) {
+                await entity.delete();
+              } else if (entity is Directory) {
+                await entity.delete(recursive: true);
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
+
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('local_profile_photo_path_$uid');
+      await prefs.clear();
 
       // 3. Delete Firebase Auth user
       await user.delete();
