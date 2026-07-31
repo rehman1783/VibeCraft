@@ -60,10 +60,10 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCzZO_0YR7QJ2URCT0u3ScfGDh7luPv698',
-    appId: '1:56650199153:android:cec66be8273d264fb3ebd0',
-    messagingSenderId: '56650199153',
-    projectId: 'wallzen-889d8',
-    storageBucket: 'wallzen-889d8.firebasestorage.app',
+    apiKey: 'AIzaSyBsEPc0PqIxinuSVkF8v9AeFfiIdR_K4LY',
+    appId: '1:197785385774:android:1aaadbc7679edcbd1258bf',
+    messagingSenderId: '197785385774',
+    projectId: 'vibecraft-wallpaper',
+    storageBucket: 'vibecraft-wallpaper.firebasestorage.app',
   );
 }

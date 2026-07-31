@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "56650199153",
-    "project_id": "wallzen-889d8",
-    "storage_bucket": "wallzen-889d8.firebasestorage.app"
+    "project_number": "197785385774",
+    "project_id": "vibecraft-wallpaper",
+    "storage_bucket": "vibecraft-wallpaper.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:56650199153:android:7bc8acb01fe46007b3ebd0",
+        "mobilesdk_app_id": "1:197785385774:android:1aaadbc7679edcbd1258bf",
         "android_client_info": {
           "package_name": "com.vibecraft.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "56650199153-3po85q2je56nftut38nkanaqn27out6i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCzZO_0YR7QJ2URCT0u3ScfGDh7luPv698"
+          "current_key": "AIzaSyBsEPc0PqIxinuSVkF8v9AeFfiIdR_K4LY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "56650199153-3po85q2je56nftut38nkanaqn27out6i.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
