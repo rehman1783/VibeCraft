@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// A single menu option tile used in the Profile screen.
 ///
@@ -40,9 +40,11 @@ class ProfileMenuTile extends StatelessWidget {
 
     final titleColor = isDestructive
         ? AppColors.secondary
-        : (theme.textTheme.bodyLarge?.color ?? (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary));
+        : (theme.textTheme.bodyLarge?.color ??
+              (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary));
 
-    final subtitleColor = theme.textTheme.bodyMedium?.color ??
+    final subtitleColor =
+        theme.textTheme.bodyMedium?.color ??
         (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary);
 
     return Padding(
@@ -93,10 +95,7 @@ class ProfileMenuTile extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           subtitle!,
-                          style: TextStyle(
-                            color: subtitleColor,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: subtitleColor, fontSize: 12),
                         ),
                       ],
                     ],

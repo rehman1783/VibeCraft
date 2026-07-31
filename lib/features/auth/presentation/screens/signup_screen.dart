@@ -1,13 +1,13 @@
 // lib/features/auth/presentation/screens/signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/widgets/vibe_button.dart';
-import 'package:wall_zen/core/widgets/vibe_text_field.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/features/auth/presentation/widgets/auth_header.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/widgets/vibe_button.dart';
+import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/features/auth/presentation/widgets/auth_header.dart';
+import 'package:vibe_craft/routes.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -37,7 +37,10 @@ class _SignupScreenState extends State<SignupScreen> {
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
@@ -86,10 +89,10 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     context.read<AuthCubit>().signUpWithEmail(
-          name: name,
-          email: email,
-          password: password,
-        );
+      name: name,
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -104,7 +107,11 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
-            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.home,
+              (route) => false,
+            );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -142,7 +149,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       const AuthHeader(
                         title: 'CREATE ACCOUNT',
-                        subtitle: 'Join WallZen to unlock full AI creation capabilities',
+                        subtitle:
+                            'Join WallZen to unlock full AI creation capabilities',
                       ),
                       const SizedBox(height: 32),
                       VibeTextField(

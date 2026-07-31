@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// Displays the user's profile avatar with a camera edit badge,
 /// display name with an edit pencil icon, and email address in a glassmorphic card.
@@ -48,10 +48,12 @@ class ProfileUserCard extends StatelessWidget {
         ? AppColors.primary.withValues(alpha: 0.15)
         : AppColors.lightBorder;
 
-    final nameColor = theme.textTheme.bodyLarge?.color ??
+    final nameColor =
+        theme.textTheme.bodyLarge?.color ??
         (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary);
 
-    final emailColor = theme.textTheme.bodyMedium?.color ??
+    final emailColor =
+        theme.textTheme.bodyMedium?.color ??
         (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary);
 
     final avatarImage = _getAvatarImage();
@@ -166,10 +168,7 @@ class ProfileUserCard extends StatelessWidget {
                   email != null && email!.isNotEmpty
                       ? email!
                       : 'No email address',
-                  style: TextStyle(
-                    color: emailColor,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: emailColor, fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

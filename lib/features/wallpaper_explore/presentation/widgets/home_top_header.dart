@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// Displays the app logo/name and a user avatar/profile button.
 class HomeTopHeader extends StatelessWidget {
@@ -36,7 +36,9 @@ class HomeTopHeader extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final avatarBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final iconColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final iconColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     final avatarImage = _getAvatarImage();
 
@@ -88,11 +90,7 @@ class HomeTopHeader extends StatelessWidget {
               backgroundColor: avatarBg,
               backgroundImage: avatarImage,
               child: avatarImage == null
-                  ? Icon(
-                      Icons.person_rounded,
-                      color: iconColor,
-                      size: 22,
-                    )
+                  ? Icon(Icons.person_rounded, color: iconColor, size: 22)
                   : null,
             ),
           ),

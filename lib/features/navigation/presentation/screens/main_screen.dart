@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/utils/app_snackbar.dart';
-import 'package:wall_zen/core/widgets/custom_bottom_navigation_bar.dart';
-import 'package:wall_zen/features/ai_creator/presentation/screens/ai_studio_screen.dart';
-import 'package:wall_zen/features/downloads/presentation/screens/downloads_screen.dart';
-import 'package:wall_zen/features/navigation/presentation/cubit/navigation_cubit.dart';
-import 'package:wall_zen/features/profile/presentation/screens/profile_screen.dart';
-import 'package:wall_zen/features/wallpaper_explore/presentation/screens/home_feed_screen.dart';
+import 'package:vibe_craft/core/utils/app_snackbar.dart';
+import 'package:vibe_craft/core/widgets/custom_bottom_navigation_bar.dart';
+import 'package:vibe_craft/features/ai_creator/presentation/screens/ai_studio_screen.dart';
+import 'package:vibe_craft/features/downloads/presentation/screens/downloads_screen.dart';
+import 'package:vibe_craft/features/navigation/presentation/cubit/navigation_cubit.dart';
+import 'package:vibe_craft/features/profile/presentation/screens/profile_screen.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/screens/home_feed_screen.dart';
 
 /// Root screen that contains an [IndexedStack] of tab screens and a
 /// [CustomBottomNavigationBar].
@@ -48,7 +48,8 @@ class _MainScreenState extends State<MainScreen> {
               // Case C: Home tab -> double back to exit application
               final now = DateTime.now();
               if (_lastPressedAt == null ||
-                  now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
+                  now.difference(_lastPressedAt!) >
+                      const Duration(seconds: 2)) {
                 _lastPressedAt = now;
                 AppSnackBar.showInfo(context, 'Press back again to exit');
               } else {
@@ -71,4 +72,3 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-

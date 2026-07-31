@@ -1,8 +1,8 @@
 // lib/features/auth/presentation/screens/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/routes.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 

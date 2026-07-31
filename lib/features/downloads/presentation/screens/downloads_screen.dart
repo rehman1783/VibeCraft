@@ -8,8 +8,8 @@ import '../../../../routes.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../../wallpaper_explore/domain/entities/wallpaper_entity.dart';
-import 'package:wall_zen/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
-import 'package:wall_zen/features/wallpaper_explore/presentation/cubit/wallpaper_state.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_state.dart';
 import '../widgets/downloads_toggle_switch.dart';
 
 class DownloadsScreen extends StatefulWidget {
@@ -35,8 +35,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondaryTextColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       body: SafeArea(
@@ -75,21 +76,30 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                     Expanded(
                       child: _isDownloadedSelected
                           ? (downloadedList.isEmpty
-                              ? _buildEmptyState(
-                                  secondaryTextColor,
-                                  'No downloads yet',
-                                  'Your downloaded wallpapers will appear here',
-                                  Icons.download_outlined,
-                                )
-                              : _buildGrid(downloadedList, isDark, secondaryTextColor))
+                                ? _buildEmptyState(
+                                    secondaryTextColor,
+                                    'No downloads yet',
+                                    'Your downloaded wallpapers will appear here',
+                                    Icons.download_outlined,
+                                  )
+                                : _buildGrid(
+                                    downloadedList,
+                                    isDark,
+                                    secondaryTextColor,
+                                  ))
                           : (favoritesList.isEmpty
-                              ? _buildEmptyState(
-                                  secondaryTextColor,
-                                  'No favorites yet',
-                                  'Tap the heart icon on wallpapers to save favorites',
-                                  Icons.favorite_outline_rounded,
-                                )
-                              : _buildGrid(favoritesList, isDark, secondaryTextColor, isFavoritesTab: true)),
+                                ? _buildEmptyState(
+                                    secondaryTextColor,
+                                    'No favorites yet',
+                                    'Tap the heart icon on wallpapers to save favorites',
+                                    Icons.favorite_outline_rounded,
+                                  )
+                                : _buildGrid(
+                                    favoritesList,
+                                    isDark,
+                                    secondaryTextColor,
+                                    isFavoritesTab: true,
+                                  )),
                     ),
                   ],
                 );
@@ -128,10 +138,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: TextStyle(
-              color: secondaryTextColor,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: secondaryTextColor, fontSize: 14),
           ),
         ],
       ),
@@ -160,15 +167,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          final isLocalFile = !item.highResUrl.startsWith('http') && File(item.highResUrl).existsSync();
+          final isLocalFile =
+              !item.highResUrl.startsWith('http') &&
+              File(item.highResUrl).existsSync();
 
           return GestureDetector(
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                AppRoutes.detail,
-                arguments: item,
-              );
+              Navigator.pushNamed(context, AppRoutes.detail, arguments: item);
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -192,15 +197,21 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                   width: double.infinity,
                                 )
                               : CachedNetworkImage(
-                                  imageUrl: item.thumbnailUrl.isNotEmpty ? item.thumbnailUrl : item.highResUrl,
+                                  imageUrl: item.thumbnailUrl.isNotEmpty
+                                      ? item.thumbnailUrl
+                                      : item.highResUrl,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   placeholder: (context, url) => const Center(
                                     child: CircularProgressIndicator(),
                                   ),
-                                  errorWidget: (context, url, error) => const Center(
-                                    child: Icon(Icons.broken_image_rounded, color: Colors.grey),
-                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Center(
+                                        child: Icon(
+                                          Icons.broken_image_rounded,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                 ),
 
                           // Heart toggle button on top right
@@ -209,7 +220,9 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                             right: 8,
                             child: BlocBuilder<FavoritesCubit, FavoritesState>(
                               builder: (context, favState) {
-                                final isFav = context.read<FavoritesCubit>().isFavorite(item.id);
+                                final isFav = context
+                                    .read<FavoritesCubit>()
+                                    .isFavorite(item.id);
 
                                 return GestureDetector(
                                   onTap: () async {
@@ -218,21 +231,33 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                                         .toggleFavorite(item);
                                     if (context.mounted) {
                                       if (isNowFav) {
-                                        AppSnackBar.showSuccess(context, 'Added to Favorites');
+                                        AppSnackBar.showSuccess(
+                                          context,
+                                          'Added to Favorites',
+                                        );
                                       } else {
-                                        AppSnackBar.showInfo(context, 'Removed from Favorites');
+                                        AppSnackBar.showInfo(
+                                          context,
+                                          'Removed from Favorites',
+                                        );
                                       }
                                     }
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.5),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.5,
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
-                                      isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                      color: isFav ? Colors.redAccent : Colors.white,
+                                      isFav
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      color: isFav
+                                          ? Colors.redAccent
+                                          : Colors.white,
                                       size: 18,
                                     ),
                                   ),
@@ -262,17 +287,24 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isLocalFile
-                                      ? AppColors.primary.withValues(alpha: 0.15)
+                                      ? AppColors.primary.withValues(
+                                          alpha: 0.15,
+                                        )
                                       : Colors.blue.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   isLocalFile ? 'Downloaded' : 'Online',
                                   style: TextStyle(
-                                    color: isLocalFile ? AppColors.primary : Colors.blue,
+                                    color: isLocalFile
+                                        ? AppColors.primary
+                                        : Colors.blue,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                   ),

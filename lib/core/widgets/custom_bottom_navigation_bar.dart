@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// A modern floating / glassmorphic bottom navigation bar with 3 tabs.
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -14,22 +14,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
   });
 
   static const List<_NavItem> _tabs = [
-    _NavItem(
-      label: 'Home',
-      icon: Icons.grid_view_rounded,
-    ),
-    _NavItem(
-      label: 'AI',
-      icon: Icons.auto_awesome_rounded,
-    ),
-    _NavItem(
-      label: 'Downloads',
-      icon: Icons.bookmark_rounded,
-    ),
-    _NavItem(
-      label: 'Profile',
-      icon: Icons.person_rounded,
-    ),
+    _NavItem(label: 'Home', icon: Icons.grid_view_rounded),
+    _NavItem(label: 'AI', icon: Icons.auto_awesome_rounded),
+    _NavItem(label: 'Downloads', icon: Icons.bookmark_rounded),
+    _NavItem(label: 'Profile', icon: Icons.person_rounded),
   ];
 
   @override
@@ -102,10 +90,7 @@ class _NavItem {
   final String label;
   final IconData icon;
 
-  const _NavItem({
-    required this.label,
-    required this.icon,
-  });
+  const _NavItem({required this.label, required this.icon});
 }
 
 class _NavBarItem extends StatelessWidget {
@@ -125,8 +110,9 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inactiveColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final inactiveColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
     final activeColor = AppColors.primary;
 
     return GestureDetector(

@@ -1,6 +1,6 @@
 // lib/features/auth/data/models/user_model.dart
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wall_zen/features/auth/domain/entities/user_entity.dart';
+import 'package:vibe_craft/features/auth/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({

@@ -1,8 +1,8 @@
 // lib/features/auth/data/repositories/auth_repository_impl.dart
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wall_zen/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:wall_zen/features/auth/domain/entities/user_entity.dart';
-import 'package:wall_zen/features/auth/domain/repositories/auth_repository.dart';
+import 'package:vibe_craft/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:vibe_craft/features/auth/domain/entities/user_entity.dart';
+import 'package:vibe_craft/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -67,9 +67,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> resetPassword({required String newPassword, String? oobCode}) async {
+  Future<void> resetPassword({
+    required String newPassword,
+    String? oobCode,
+  }) async {
     try {
-      await remoteDataSource.resetPassword(newPassword: newPassword, oobCode: oobCode);
+      await remoteDataSource.resetPassword(
+        newPassword: newPassword,
+        oobCode: oobCode,
+      );
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     } catch (e) {
@@ -83,11 +89,13 @@ class AuthRepositoryImpl implements AuthRepository {
         return e.message ?? 'No account found with this email address.';
       case 'wrong-password':
       case 'invalid-credential':
-        return e.message ?? 'Incorrect password. Please enter the correct password.';
+        return e.message ??
+            'Incorrect password. Please enter the correct password.';
       case 'email-already-in-use':
         return 'An account with this email already exists.';
       case 'invalid-email':
-        return e.message ?? 'This email does not exist. Please enter a valid, active email address.';
+        return e.message ??
+            'This email does not exist. Please enter a valid, active email address.';
       case 'weak-password':
         return 'Password must be at least 6 characters long.';
       case 'network-request-failed':

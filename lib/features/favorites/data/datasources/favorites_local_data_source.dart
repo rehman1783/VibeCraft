@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wall_zen/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
+import 'package:vibe_craft/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
 
 abstract class FavoritesLocalDataSource {
   Future<List<WallpaperEntity>> getFavoriteWallpapers();
@@ -22,13 +22,17 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   Future<List<WallpaperEntity>> getFavoriteWallpapers() async {
     final jsonList = sharedPreferences.getStringList(_favoritesKey) ?? [];
     final list = jsonList
-        .map((str) => WallpaperEntity.fromJson(jsonDecode(str) as Map<String, dynamic>))
+        .map(
+          (str) =>
+              WallpaperEntity.fromJson(jsonDecode(str) as Map<String, dynamic>),
+        )
         .toList();
 
     // Verify local file paths: if local file was deleted or pruned, fallback to raw/thumbnail URL
     bool needsSave = false;
     final List<WallpaperEntity> sanitizedList = list.map((WallpaperEntity w) {
-      if (!w.highResUrl.startsWith('http') && !File(w.highResUrl).existsSync()) {
+      if (!w.highResUrl.startsWith('http') &&
+          !File(w.highResUrl).existsSync()) {
         needsSave = true;
         final fallbackUrl = w.rawUrl.isNotEmpty ? w.rawUrl : w.thumbnailUrl;
         return WallpaperEntity(
@@ -50,7 +54,9 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
     }).toList();
 
     if (needsSave) {
-      final updatedJsonList = sanitizedList.map((item) => jsonEncode(item.toJson())).toList();
+      final updatedJsonList = sanitizedList
+          .map((item) => jsonEncode(item.toJson()))
+          .toList();
       await sharedPreferences.setStringList(_favoritesKey, updatedJsonList);
     }
 
@@ -74,9 +80,14 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
       isNowFavorite = false;
     } else {
       // Check if wallpaper is already downloaded locally
-      final downloadedJson = sharedPreferences.getStringList(_downloadedKey) ?? [];
+      final downloadedJson =
+          sharedPreferences.getStringList(_downloadedKey) ?? [];
       final List<WallpaperEntity> downloadedList = downloadedJson
-          .map((str) => WallpaperEntity.fromJson(jsonDecode(str) as Map<String, dynamic>))
+          .map(
+            (str) => WallpaperEntity.fromJson(
+              jsonDecode(str) as Map<String, dynamic>,
+            ),
+          )
           .toList();
 
       final WallpaperEntity downloadedMatch = downloadedList.firstWhere(
@@ -88,13 +99,18 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
       isNowFavorite = true;
     }
 
-    final jsonList = favorites.map((item) => jsonEncode(item.toJson())).toList();
+    final jsonList = favorites
+        .map((item) => jsonEncode(item.toJson()))
+        .toList();
     await sharedPreferences.setStringList(_favoritesKey, jsonList);
     return isNowFavorite;
   }
 
   @override
-  Future<void> updateFavoriteLocalPath(String wallpaperId, String localPath) async {
+  Future<void> updateFavoriteLocalPath(
+    String wallpaperId,
+    String localPath,
+  ) async {
     final favorites = await getFavoriteWallpapers();
     final index = favorites.indexWhere((w) => w.id == wallpaperId);
     if (index >= 0) {
@@ -114,7 +130,9 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
         height: old.height,
       );
       favorites[index] = updated;
-      final jsonList = favorites.map((item) => jsonEncode(item.toJson())).toList();
+      final jsonList = favorites
+          .map((item) => jsonEncode(item.toJson()))
+          .toList();
       await sharedPreferences.setStringList(_favoritesKey, jsonList);
     }
   }
@@ -122,7 +140,9 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
   @override
   Future<void> sanitizeFavoritesAfterCacheClear() async {
     final favorites = await getFavoriteWallpapers();
-    final List<WallpaperEntity> sanitizedList = favorites.map((WallpaperEntity w) {
+    final List<WallpaperEntity> sanitizedList = favorites.map((
+      WallpaperEntity w,
+    ) {
       if (!w.highResUrl.startsWith('http')) {
         final fallbackUrl = w.rawUrl.isNotEmpty ? w.rawUrl : w.thumbnailUrl;
         return WallpaperEntity(
@@ -143,7 +163,9 @@ class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
       return w;
     }).toList();
 
-    final jsonList = sanitizedList.map((item) => jsonEncode(item.toJson())).toList();
+    final jsonList = sanitizedList
+        .map((item) => jsonEncode(item.toJson()))
+        .toList();
     await sharedPreferences.setStringList(_favoritesKey, jsonList);
   }
 }

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/theme/theme_cubit.dart';
-import 'package:wall_zen/core/utils/app_snackbar.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/features/favorites/presentation/cubit/favorites_cubit.dart';
-import 'package:wall_zen/features/profile/presentation/cubit/profile_cubit.dart';
-import 'package:wall_zen/features/profile/presentation/cubit/profile_state.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/clear_cache_dialog.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/delete_account_dialog.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/edit_name_bottom_sheet.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/profile_header_card.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/profile_menu_tile.dart';
-import 'package:wall_zen/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/theme_cubit.dart';
+import 'package:vibe_craft/core/utils/app_snackbar.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:vibe_craft/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:vibe_craft/features/profile/presentation/cubit/profile_state.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/clear_cache_dialog.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/delete_account_dialog.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/edit_name_bottom_sheet.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/profile_header_card.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/profile_menu_tile.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
+import 'package:vibe_craft/routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -98,10 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is Unauthenticated) {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.login,
-                (route) => false,
-              );
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
             }
           },
         ),
@@ -170,7 +169,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
-                          child: CircularProgressIndicator(color: AppColors.primary),
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
                         ),
                       )
                     else
@@ -224,7 +225,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: 'Privacy Policy & Terms',
                       subtitle: 'Terms of service & privacy compliance',
                       onTap: () {
-                        Navigator.of(context).pushNamed(AppRoutes.privacyPolicy);
+                        Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.privacyPolicy);
                       },
                     ),
                     ProfileMenuTile(
@@ -274,7 +277,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSectionTitle(BuildContext context, String title) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final color = isDark ? AppColors.primary.withValues(alpha: 0.8) : AppColors.primary;
+    final color = isDark
+        ? AppColors.primary.withValues(alpha: 0.8)
+        : AppColors.primary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),

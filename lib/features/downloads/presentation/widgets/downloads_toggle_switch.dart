@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// A pill‑style toggle switch for switching between "Downloaded" and
 /// "Favorites" sections.
@@ -19,8 +19,12 @@ class DownloadsToggleSwitch extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final containerBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final containerBorder = isDark ? null : Border.all(color: AppColors.lightBorder);
-    final inactiveTextColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final containerBorder = isDark
+        ? null
+        : Border.all(color: AppColors.lightBorder);
+    final inactiveTextColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

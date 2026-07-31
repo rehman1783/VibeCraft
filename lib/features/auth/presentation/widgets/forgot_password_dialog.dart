@@ -2,12 +2,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/widgets/vibe_button.dart';
-import 'package:wall_zen/core/widgets/vibe_text_field.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/widgets/vibe_button.dart';
+import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/routes.dart';
 
 class ForgotPasswordDialog extends StatefulWidget {
   const ForgotPasswordDialog({super.key});
@@ -169,13 +169,17 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
                       children: [
                         Expanded(
                           child: TextButton(
-                            onPressed: isLoading ? null : () => Navigator.of(context).pop(),
+                            onPressed: isLoading
+                                ? null
+                                : () => Navigator.of(context).pop(),
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 side: BorderSide(
-                                  color: AppColors.textSecondary.withValues(alpha: 0.3),
+                                  color: AppColors.textSecondary.withValues(
+                                    alpha: 0.3,
+                                  ),
                                 ),
                               ),
                             ),

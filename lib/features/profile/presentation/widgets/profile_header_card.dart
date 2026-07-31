@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/features/profile/presentation/widgets/profile_user_card.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/profile_user_card.dart';
 
 /// Extracted custom widget for the Profile Header Card.
 class ProfileHeaderCard extends StatelessWidget {

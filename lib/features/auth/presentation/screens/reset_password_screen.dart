@@ -1,20 +1,17 @@
 // lib/features/auth/presentation/screens/reset_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/widgets/vibe_button.dart';
-import 'package:wall_zen/core/widgets/vibe_text_field.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/widgets/vibe_button.dart';
+import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
 
-  const ResetPasswordScreen({
-    super.key,
-    this.email = '',
-  });
+  const ResetPasswordScreen({super.key, this.email = ''});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -68,7 +65,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: isSuccess ? AppColors.primary : AppColors.secondary.withValues(alpha: 0.6),
+            color: isSuccess
+                ? AppColors.primary
+                : AppColors.secondary.withValues(alpha: 0.6),
             width: 1.5,
           ),
         ),
@@ -88,8 +87,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is PasswordResetSuccess || state is Authenticated) {
-            _showSnackBar('Password has been successfully changed!', isSuccess: true);
-            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) => false);
+            _showSnackBar(
+              'Password has been successfully changed!',
+              isSuccess: true,
+            );
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.home,
+              (route) => false,
+            );
           } else if (state is AuthError) {
             _showSnackBar(state.message);
           }

@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/widgets/vibe_button.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/widgets/vibe_button.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/routes.dart';
 
 class ForgotPasswordSentScreen extends StatefulWidget {
   final String email;

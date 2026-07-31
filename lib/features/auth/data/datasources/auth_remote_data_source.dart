@@ -2,7 +2,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wall_zen/features/auth/data/models/user_model.dart';
+import 'package:vibe_craft/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel> signInWithEmail({
@@ -146,7 +146,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (!isValidDomain) {
       throw FirebaseAuthException(
         code: 'invalid-email',
-        message: 'This email domain does not exist. Please enter a valid, active email address.',
+        message:
+            'This email domain does not exist. Please enter a valid, active email address.',
       );
     }
 
@@ -171,12 +172,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e.code == 'invalid-email') {
         throw FirebaseAuthException(
           code: 'invalid-email',
-          message: 'This email does not exist. Please enter a valid, active email address.',
+          message:
+              'This email does not exist. Please enter a valid, active email address.',
         );
       } else if (e.code == 'email-already-in-use') {
         throw FirebaseAuthException(
           code: 'email-already-in-use',
-          message: 'An account with this email already exists. Please login instead.',
+          message:
+              'An account with this email already exists. Please login instead.',
         );
       }
       rethrow;
@@ -245,7 +248,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> resetPassword({required String newPassword, String? oobCode}) async {
+  Future<void> resetPassword({
+    required String newPassword,
+    String? oobCode,
+  }) async {
     if (oobCode != null && oobCode.isNotEmpty) {
       await firebaseAuth.confirmPasswordReset(
         code: oobCode,
@@ -262,7 +268,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       } else {
         throw FirebaseAuthException(
           code: 'no-user',
-          message: 'Unable to update password. Please use the reset link sent to your email.',
+          message:
+              'Unable to update password. Please use the reset link sent to your email.',
         );
       }
     }

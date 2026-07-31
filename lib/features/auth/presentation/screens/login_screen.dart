@@ -1,14 +1,14 @@
 // lib/features/auth/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/core/widgets/vibe_button.dart';
-import 'package:wall_zen/core/widgets/vibe_text_field.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
-import 'package:wall_zen/features/auth/presentation/widgets/auth_header.dart';
-import 'package:wall_zen/features/auth/presentation/widgets/forgot_password_dialog.dart';
-import 'package:wall_zen/routes.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/widgets/vibe_button.dart';
+import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/features/auth/presentation/widgets/auth_header.dart';
+import 'package:vibe_craft/features/auth/presentation/widgets/forgot_password_dialog.dart';
+import 'package:vibe_craft/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,10 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onForgotPasswordPressed() {
-    showDialog(
-      context: context,
-      builder: (_) => const ForgotPasswordDialog(),
-    );
+    showDialog(context: context, builder: (_) => const ForgotPasswordDialog());
   }
 
   @override
@@ -88,7 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
                       const AuthHeader(
                         title: 'WELCOME BACK',
-                        subtitle: 'Sign in to access your saved wallpapers & AI Studio',
+                        subtitle:
+                            'Sign in to access your saved wallpapers & AI Studio',
                       ),
                       const SizedBox(height: 36),
                       VibeTextField(
@@ -131,7 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: AppColors.textSecondary),
                           ),
                           GestureDetector(
-                            onTap: () => Navigator.pushNamed(context, AppRoutes.signup),
+                            onTap: () =>
+                                Navigator.pushNamed(context, AppRoutes.signup),
                             child: const Text(
                               'Sign Up',
                               style: TextStyle(

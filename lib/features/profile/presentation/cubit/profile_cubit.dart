@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wall_zen/features/profile/presentation/cubit/profile_state.dart';
+import 'package:vibe_craft/features/profile/presentation/cubit/profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final FirebaseAuth _firebaseAuth;
@@ -17,10 +17,10 @@ class ProfileCubit extends Cubit<ProfileState> {
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
     ImagePicker? imagePicker,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance,
-        _imagePicker = imagePicker ?? ImagePicker(),
-        super(ProfileInitial());
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance,
+       _imagePicker = imagePicker ?? ImagePicker(),
+       super(ProfileInitial());
 
   Future<void> fetchUserProfile() async {
     emit(ProfileLoading());
@@ -36,7 +36,9 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       // Read local profile photo path if exists
       final prefs = await SharedPreferences.getInstance();
-      String? localPhotoPath = prefs.getString('local_profile_photo_path_${user.uid}');
+      String? localPhotoPath = prefs.getString(
+        'local_profile_photo_path_${user.uid}',
+      );
       if (localPhotoPath != null && !File(localPhotoPath).existsSync()) {
         localPhotoPath = null;
       }
@@ -60,13 +62,15 @@ class ProfileCubit extends Cubit<ProfileState> {
         displayName = email.isNotEmpty ? email.split('@').first : 'User';
       }
 
-      emit(ProfileLoaded(
-        uid: user.uid,
-        displayName: displayName,
-        email: email,
-        photoUrl: user.photoURL,
-        localPhotoPath: localPhotoPath,
-      ));
+      emit(
+        ProfileLoaded(
+          uid: user.uid,
+          displayName: displayName,
+          email: email,
+          photoUrl: user.photoURL,
+          localPhotoPath: localPhotoPath,
+        ),
+      );
     } catch (e) {
       emit(ProfileError(e.toString()));
     }
@@ -122,11 +126,17 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(ProfileUpdating());
 
       final appDir = await getApplicationDocumentsDirectory();
-      final fileName = 'avatar_${user.uid}_${DateTime.now().millisecondsSinceEpoch}.png';
-      final savedFile = await File(pickedFile.path).copy('${appDir.path}/$fileName');
+      final fileName =
+          'avatar_${user.uid}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final savedFile = await File(
+        pickedFile.path,
+      ).copy('${appDir.path}/$fileName');
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('local_profile_photo_path_${user.uid}', savedFile.path);
+      await prefs.setString(
+        'local_profile_photo_path_${user.uid}',
+        savedFile.path,
+      );
 
       emit(const ProfileUpdateSuccess('Profile photo updated successfully!'));
       await fetchUserProfile();
@@ -180,9 +190,11 @@ class ProfileCubit extends Cubit<ProfileState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      emit(const CacheClearedSuccess(
-        'All app cache, downloads, and user data cleared successfully.',
-      ));
+      emit(
+        const CacheClearedSuccess(
+          'All app cache, downloads, and user data cleared successfully.',
+        ),
+      );
       await fetchUserProfile();
     } catch (e) {
       emit(ProfileError('Failed to clear cache: ${e.toString()}'));
@@ -215,9 +227,11 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(AccountDeletedSuccess());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'requires-recent-login') {
-        emit(const ReauthRequired(
-          'Security check: Account deletion requires recent authentication. Please log out and log back in, then try again.',
-        ));
+        emit(
+          const ReauthRequired(
+            'Security check: Account deletion requires recent authentication. Please log out and log back in, then try again.',
+          ),
+        );
       } else {
         emit(ProfileError(e.message ?? 'Failed to delete account.'));
       }

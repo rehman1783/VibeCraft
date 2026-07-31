@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/features/auth/presentation/screens/forgot_password_sent_screen.dart';
-import 'package:wall_zen/features/auth/presentation/screens/login_screen.dart';
-import 'package:wall_zen/features/auth/presentation/screens/reset_password_screen.dart';
-import 'package:wall_zen/features/auth/presentation/screens/signup_screen.dart';
-import 'package:wall_zen/features/auth/presentation/screens/splash_screen.dart';
-import 'package:wall_zen/features/navigation/presentation/screens/main_screen.dart';
-import 'package:wall_zen/features/profile/presentation/screens/privacy_policy_screen.dart';
-import 'package:wall_zen/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
-import 'package:wall_zen/features/wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
+import 'package:vibe_craft/features/auth/presentation/screens/forgot_password_sent_screen.dart';
+import 'package:vibe_craft/features/auth/presentation/screens/login_screen.dart';
+import 'package:vibe_craft/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:vibe_craft/features/auth/presentation/screens/signup_screen.dart';
+import 'package:vibe_craft/features/auth/presentation/screens/splash_screen.dart';
+import 'package:vibe_craft/features/navigation/presentation/screens/main_screen.dart';
+import 'package:vibe_craft/features/profile/presentation/screens/privacy_policy_screen.dart';
+import 'package:vibe_craft/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -52,9 +52,7 @@ class AppRoutes {
         );
 
       case privacyPolicy:
-        return MaterialPageRoute(
-          builder: (_) => const PrivacyPolicyScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
 
       default:
         return MaterialPageRoute(

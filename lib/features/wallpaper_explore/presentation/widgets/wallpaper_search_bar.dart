@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 /// A modern search bar for wallpapers with real-time auto-complete suggestions.
 class WallpaperSearchBar extends StatefulWidget {
@@ -72,7 +72,8 @@ class _WallpaperSearchBarState extends State<WallpaperSearchBar> {
 
   void _onFocusChange() {
     setState(() {
-      _showSuggestions = _effectiveFocusNode.hasFocus && _filteredSuggestions.isNotEmpty;
+      _showSuggestions =
+          _effectiveFocusNode.hasFocus && _filteredSuggestions.isNotEmpty;
     });
   }
 
@@ -118,8 +119,12 @@ class _WallpaperSearchBarState extends State<WallpaperSearchBar> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final textColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-    final hintColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.textPrimary
+        : AppColors.lightTextPrimary;
+    final hintColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
     final fillColor = isDark
         ? AppColors.surface.withValues(alpha: 0.6)
         : AppColors.lightSurface;
@@ -149,16 +154,10 @@ class _WallpaperSearchBarState extends State<WallpaperSearchBar> {
             decoration: InputDecoration(
               hintText: 'Search wallpapers...',
               hintStyle: TextStyle(color: hintColor),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: hintColor,
-              ),
+              prefixIcon: Icon(Icons.search_rounded, color: hintColor),
               suffixIcon: _effectiveController.text.isNotEmpty
                   ? IconButton(
-                      icon: Icon(
-                        Icons.clear_rounded,
-                        color: hintColor,
-                      ),
+                      icon: Icon(Icons.clear_rounded, color: hintColor),
                       onPressed: () {
                         _effectiveController.clear();
                         setState(() {
@@ -181,14 +180,14 @@ class _WallpaperSearchBarState extends State<WallpaperSearchBar> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide(
-                  color: enabledBorderColor,
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: enabledBorderColor, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -229,7 +228,10 @@ class _WallpaperSearchBarState extends State<WallpaperSearchBar> {
 
                     return ListTile(
                       dense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 2,
+                      ),
                       leading: Icon(
                         isRecent ? Icons.history_rounded : Icons.search_rounded,
                         size: 18,

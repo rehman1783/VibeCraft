@@ -1,7 +1,7 @@
 // lib/features/auth/presentation/cubit/auth_cubit.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/features/auth/domain/repositories/auth_repository.dart';
-import 'package:wall_zen/features/auth/presentation/cubit/auth_state.dart';
+import 'package:vibe_craft/features/auth/domain/repositories/auth_repository.dart';
+import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository authRepository;
@@ -76,14 +76,20 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> resetPassword({required String newPassword, String? oobCode}) async {
+  Future<void> resetPassword({
+    required String newPassword,
+    String? oobCode,
+  }) async {
     if (newPassword.length < 6) {
       emit(const AuthError('Password must be at least 6 characters long.'));
       return;
     }
     emit(AuthLoading());
     try {
-      await authRepository.resetPassword(newPassword: newPassword, oobCode: oobCode);
+      await authRepository.resetPassword(
+        newPassword: newPassword,
+        oobCode: oobCode,
+      );
       emit(const PasswordResetSuccess());
     } catch (e) {
       emit(AuthError(e.toString()));

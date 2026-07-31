@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
-import 'package:wall_zen/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/features/profile/presentation/cubit/profile_cubit.dart';
 
 class EditNameBottomSheet extends StatefulWidget {
   final String currentName;
 
-  const EditNameBottomSheet({
-    super.key,
-    required this.currentName,
-  });
+  const EditNameBottomSheet({super.key, required this.currentName});
 
   static Future<void> show(BuildContext context, String currentName) {
     return showModalBottomSheet(
@@ -54,8 +51,12 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
     final isDark = theme.brightness == Brightness.dark;
 
     final sheetBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final textPrimary = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-    final textSecondary = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : AppColors.lightTextPrimary;
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -100,10 +101,7 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
               const SizedBox(height: 4),
               Text(
                 'Enter your new full name below to update your profile.',
-                style: TextStyle(
-                  color: textSecondary,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: textSecondary, fontSize: 13),
               ),
 
               const SizedBox(height: 20),
@@ -116,12 +114,17 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
                   labelText: 'Full Name',
                   labelStyle: TextStyle(color: textSecondary),
                   hintText: 'e.g. John Doe',
-                  hintStyle: TextStyle(color: textSecondary.withValues(alpha: 0.6)),
+                  hintStyle: TextStyle(
+                    color: textSecondary.withValues(alpha: 0.6),
+                  ),
                   filled: true,
                   fillColor: isDark
                       ? AppColors.background.withValues(alpha: 0.5)
                       : AppColors.lightInputFill,
-                  prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
+                  prefixIcon: const Icon(
+                    Icons.person_outline_rounded,
+                    color: AppColors.primary,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -136,7 +139,10 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) {
@@ -164,10 +170,7 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
                   onPressed: _onSave,
                   child: const Text(
                     'Save Name',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

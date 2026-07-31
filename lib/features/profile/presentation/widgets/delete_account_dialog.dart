@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wall_zen/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/theme/app_colors.dart';
 
 class DeleteAccountDialog extends StatelessWidget {
   final VoidCallback onConfirm;
 
-  const DeleteAccountDialog({
-    super.key,
-    required this.onConfirm,
-  });
+  const DeleteAccountDialog({super.key, required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +12,12 @@ class DeleteAccountDialog extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final dialogBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final titleColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-    final bodyColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final titleColor = isDark
+        ? AppColors.textPrimary
+        : AppColors.lightTextPrimary;
+    final bodyColor = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -48,20 +49,13 @@ class DeleteAccountDialog extends StatelessWidget {
       ),
       content: Text(
         'Are you sure you want to delete your account? This action is permanent and will delete your profile document, stored settings, and saved data from WallZen.',
-        style: TextStyle(
-          color: bodyColor,
-          fontSize: 14,
-          height: 1.4,
-        ),
+        style: TextStyle(color: bodyColor, fontSize: 14, height: 1.4),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            'Cancel',
-            style: TextStyle(color: bodyColor),
-          ),
+          child: Text('Cancel', style: TextStyle(color: bodyColor)),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

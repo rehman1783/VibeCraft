@@ -1,5 +1,5 @@
 // lib/features/auth/domain/repositories/auth_repository.dart
-import 'package:wall_zen/features/auth/domain/entities/user_entity.dart';
+import 'package:vibe_craft/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
   Future<UserEntity> signInWithEmail({
