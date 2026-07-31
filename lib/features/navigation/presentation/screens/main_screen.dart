@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wall_zen/core/utils/app_snackbar.dart';
 import 'package:wall_zen/core/widgets/custom_bottom_navigation_bar.dart';
+import 'package:wall_zen/features/ai_creator/presentation/screens/ai_studio_screen.dart';
 import 'package:wall_zen/features/downloads/presentation/screens/downloads_screen.dart';
 import 'package:wall_zen/features/navigation/presentation/cubit/navigation_cubit.dart';
 import 'package:wall_zen/features/profile/presentation/screens/profile_screen.dart';
@@ -25,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static final List<Widget> _screens = [
     const HomeFeedScreen(),
+    const AICreatorScreen(),
     const DownloadsScreen(),
     const ProfileScreen(),
   ];

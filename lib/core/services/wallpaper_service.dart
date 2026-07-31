@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 class WallpaperService {
-  static const MethodChannel _channel = MethodChannel('com.example.wall_zen/wallpaper');
+  static const MethodChannel _channel = MethodChannel('com.vibecraft.app/wallpaper');
 
   /// Constants for wallpaper targets matching native implementation
   static const int targetHome = 1;

@@ -6,6 +6,8 @@ import '../cubit/ai_chat_cubit.dart';
 import '../cubit/ai_chat_state.dart';
 import '../widgets/interactive_chat_bubble.dart';
 
+typedef AICreatorScreen = AiStudioScreen;
+
 class AiStudioScreen extends StatefulWidget {
   const AiStudioScreen({super.key});
 

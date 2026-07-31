@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wall_zen/core/theme/app_theme.dart';
 import 'package:wall_zen/core/theme/theme_cubit.dart';
 import 'package:wall_zen/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:wall_zen/features/ai_creator/presentation/cubit/ai_chat_cubit.dart';
 import 'package:wall_zen/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:wall_zen/features/auth/domain/repositories/auth_repository.dart';
 import 'package:wall_zen/features/auth/presentation/cubit/auth_cubit.dart';
@@ -57,6 +58,7 @@ class WallZenApp extends StatelessWidget {
           BlocProvider<WallpaperCubit>(create: (_) => sl<WallpaperCubit>()),
           BlocProvider<FavoritesCubit>(create: (_) => sl<FavoritesCubit>()..loadFavorites()),
           BlocProvider<NavigationCubit>(create: (_) => NavigationCubit()),
+          BlocProvider<AiChatCubit>(create: (_) => AiChatCubit()),
         ],
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, themeMode) {

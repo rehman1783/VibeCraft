@@ -19,6 +19,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
       icon: Icons.grid_view_rounded,
     ),
     _NavItem(
+      label: 'AI',
+      icon: Icons.auto_awesome_rounded,
+    ),
+    _NavItem(
       label: 'Downloads',
       icon: Icons.bookmark_rounded,
     ),

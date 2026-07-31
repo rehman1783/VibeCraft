@@ -1,4 +1,4 @@
-package com.wallzen.app
+package com.vibecraft.app
 
 import android.app.WallpaperManager
 import android.graphics.Bitmap
@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.wall_zen/wallpaper"
+    private val CHANNEL = "com.vibecraft.app/wallpaper"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -124,4 +124,3 @@ class MainActivity : FlutterActivity() {
         return inSampleSize
     }
 }
-
