@@ -148,9 +148,9 @@ class HomeTopHeader extends StatelessWidget {
                       color: isDark
                           ? AppColors.textPrimary
                           : AppColors.lightTextPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.4,
                     ),
                   ),
                 ],
@@ -160,7 +160,8 @@ class HomeTopHeader extends StatelessWidget {
 
           // Notification Bell Icon with Active Dot Marker
           GestureDetector(
-            onTap: onNotificationTap ??
+            onTap:
+                onNotificationTap ??
                 () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -217,10 +218,7 @@ class HomeTopHeader extends StatelessWidget {
                           width: 1.5,
                         ),
                         boxShadow: const [
-                          BoxShadow(
-                            color: Color(0xFFFF3B30),
-                            blurRadius: 4,
-                          ),
+                          BoxShadow(color: Color(0xFFFF3B30), blurRadius: 4),
                         ],
                       ),
                     ),
