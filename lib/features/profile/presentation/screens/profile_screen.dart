@@ -9,7 +9,6 @@ import 'package:vibe_craft/features/favorites/presentation/cubit/favorites_cubit
 import 'package:vibe_craft/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:vibe_craft/features/profile/presentation/cubit/profile_state.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/clear_cache_dialog.dart';
-import 'package:vibe_craft/features/profile/presentation/widgets/delete_account_dialog.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/edit_name_bottom_sheet.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/profile_menu_tile.dart';
@@ -68,14 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _onDeleteAccount(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => DeleteAccountDialog(
-        onConfirm: () {
-          context.read<ProfileCubit>().deleteAccount();
-        },
-      ),
-    );
+    Navigator.of(context).pushNamed(AppRoutes.deleteAccount);
   }
 
   void _onClearCache(BuildContext context) {

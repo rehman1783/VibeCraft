@@ -201,13 +201,24 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount({String? password}) async {
     emit(ProfileUpdating());
     try {
       final user = _firebaseAuth.currentUser;
       if (user == null) {
         emit(const ProfileError('No authenticated user found.'));
         return;
+      }
+
+      // Re-authenticate if password is provided
+      if (password != null && password.isNotEmpty && user.email != null) {
+        try {
+          final credential = EmailAuthProvider.credential(
+            email: user.email!,
+            password: password,
+          );
+          await user.reauthenticateWithCredential(credential);
+        } catch (_) {}
       }
 
       final uid = user.uid;
