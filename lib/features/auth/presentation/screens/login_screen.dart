@@ -75,24 +75,33 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: bgBackgroundColor,
           body: Stack(
             children: [
-              // Ambient Purple Glow Background Effect (Top Half)
+              // Background Image with Ambient Dark Fade Overlay
               Positioned(
-                top: -100,
-                left: -50,
-                right: -50,
-                height: 480,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: const Alignment(0, -0.2),
-                      radius: 1.1,
-                      colors: [
-                        const Color(0xFF4A1B8C).withValues(alpha: 0.45),
-                        const Color(0xFF261042).withValues(alpha: 0.25),
-                        Colors.transparent,
-                      ],
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 460,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      'assets/images/auth_bg.png',
+                      fit: BoxFit.cover,
                     ),
-                  ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            bgBackgroundColor.withValues(alpha: 0.3),
+                            bgBackgroundColor.withValues(alpha: 0.75),
+                            bgBackgroundColor,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
