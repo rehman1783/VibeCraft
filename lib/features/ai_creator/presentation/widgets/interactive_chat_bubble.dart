@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/vibe_button.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
 class InteractiveChatBubble extends StatelessWidget {
@@ -20,8 +19,11 @@ class InteractiveChatBubble extends StatelessWidget {
 
     final isUser = message.isUser;
 
-    final assistantBubbleBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final assistantBorder = isDark ? null : Border.all(color: AppColors.lightBorder);
+    final assistantBubbleBg =
+        isDark ? const Color(0xFF161824) : AppColors.lightSurface;
+    final assistantBorder = isDark
+        ? Border.all(color: Colors.white.withValues(alpha: 0.08))
+        : Border.all(color: AppColors.lightBorder);
     final textColor = isUser
         ? Colors.white
         : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary);
@@ -29,45 +31,96 @@ class InteractiveChatBubble extends StatelessWidget {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
-        crossAxisAlignment: isUser
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
             margin: EdgeInsets.only(
-              top: 8,
-              bottom: 8,
-              left: isUser ? 48 : 0,
-              right: isUser ? 0 : 48,
+              top: 6,
+              bottom: 6,
+              left: isUser ? 54 : 0,
+              right: isUser ? 0 : 54,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: isUser ? AppColors.primary : assistantBubbleBg,
               border: isUser ? null : assistantBorder,
               borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isUser ? 16 : 0),
-                bottomRight: Radius.circular(isUser ? 0 : 16),
+                topLeft: const Radius.circular(18),
+                topRight: const Radius.circular(18),
+                bottomLeft: Radius.circular(isUser ? 18 : 4),
+                bottomRight: Radius.circular(isUser ? 4 : 18),
               ),
+              boxShadow: isUser
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 6,
+                      ),
+                    ],
             ),
             child: Text(
               message.text,
               style: TextStyle(
                 color: textColor,
-                fontSize: 15,
+                fontSize: 14.5,
+                height: 1.4,
               ),
             ),
           ),
+
+          // Prominent "✨ Create Wallpaper" Action Button for AI Messages
           if (!isUser && message.optimizedPrompt != null)
             Padding(
-              padding: const EdgeInsets.only(bottom: 12.0, left: 4.0),
-              child: SizedBox(
-                width: 225,
-                child: VibeButton(
-                  label: "✨ Create Wallpaper",
-                  // icon: Icons.auto_awesome_rounded,
+              padding: const EdgeInsets.only(bottom: 14.0, top: 4.0, left: 4.0),
+              child: Container(
+                height: 46,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF8B3CFF), Color(0xFF651FFF)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8B3CFF).withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 10,
+                    ),
+                  ),
                   onPressed: () => onGenerateTap(message.optimizedPrompt!),
+                  icon: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  label: const Text(
+                    '✨ Create Wallpaper',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
