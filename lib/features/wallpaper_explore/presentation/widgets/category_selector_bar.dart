@@ -53,22 +53,22 @@ class CategorySelectorBar extends StatelessWidget {
                   letterSpacing: -0.3,
                 ),
               ),
-              GestureDetector(
-                onTap: onSeeAllTap ??
-                    () {
-                      onCategorySelected?.call(null);
-                    },
-                child: Text(
-                  'See All',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textSecondary
-                        : AppColors.lightTextSecondary,
-                  ),
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: onSeeAllTap ??
+              //       () {
+              //         onCategorySelected?.call(null);
+              //       },
+              //   child: Text(
+              //     'See All',
+              //     style: TextStyle(
+              //       fontSize: 13,
+              //       fontWeight: FontWeight.w600,
+              //       color: isDark
+              //           ? AppColors.textSecondary
+              //           : AppColors.lightTextSecondary,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

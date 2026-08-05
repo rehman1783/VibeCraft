@@ -37,11 +37,10 @@ class WallpaperCard extends StatelessWidget {
     final isLocalFile = !wallpaper.highResUrl.startsWith('http') &&
         File(wallpaper.highResUrl).existsSync();
 
-    // Determine full clean wallpaper title text
-    final String titleText = (wallpaper.altDescription.isNotEmpty &&
-            !wallpaper.altDescription.toLowerCase().contains('vibecraft'))
-        ? wallpaper.altDescription
-        : wallpaper.photographer;
+    // Display photographer name like Explore screen wallpapers
+    final String titleText = wallpaper.photographer.trim().isNotEmpty
+        ? wallpaper.photographer.trim()
+        : 'VibeCraft';
 
     return GestureDetector(
       onTap: onTap,
