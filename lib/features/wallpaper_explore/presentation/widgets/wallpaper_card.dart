@@ -8,6 +8,9 @@ import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 
+/// Redesigned tall portrait-oriented wallpaper preview card.
+/// Features rounded corners, category overlay at bottom-left,
+/// and a heart icon integrated within a dark translucent circular overlay at bottom-right.
 class WallpaperCard extends StatelessWidget {
   final WallpaperEntity wallpaper;
   final VoidCallback onTap;
@@ -31,52 +34,125 @@ class WallpaperCard extends StatelessWidget {
       } catch (_) {}
     }
 
-    final isLocalFile = !wallpaper.highResUrl.startsWith('http') && File(wallpaper.highResUrl).existsSync();
+    final isLocalFile = !wallpaper.highResUrl.startsWith('http') &&
+        File(wallpaper.highResUrl).existsSync();
+
+    // Determine category tag label
+    String categoryTag = 'MINIMAL';
+    if (wallpaper.altDescription.isNotEmpty &&
+        !wallpaper.altDescription.toLowerCase().contains('vibecraft')) {
+      final words = wallpaper.altDescription.trim().split(' ');
+      if (words.isNotEmpty && words.first.length >= 3) {
+        categoryTag = words.first.toUpperCase();
+      }
+    }
 
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          color: cardBgColor ?? (isDark ? AppColors.surface : AppColors.lightSurface),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: isDark
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            color: cardBgColor ?? (isDark ? AppColors.surface : AppColors.lightSurface),
+            child: AspectRatio(
+              aspectRatio: 0.68, // Tall portrait aspect ratio
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
+                  // Wallpaper Image
                   isLocalFile
                       ? Image.file(
                           File(wallpaper.highResUrl),
                           fit: BoxFit.cover,
-                          width: double.infinity,
                         )
                       : CachedNetworkImage(
                           imageUrl: wallpaper.thumbnailUrl.isNotEmpty
                               ? wallpaper.thumbnailUrl
                               : wallpaper.highResUrl,
                           fit: BoxFit.cover,
-                          width: double.infinity,
                           placeholder: (context, url) => Container(
-                            height: 180,
-                            color: cardBgColor ?? (isDark ? Colors.grey.shade900 : Colors.grey.shade200),
+                            color: cardBgColor ??
+                                (isDark ? Colors.grey.shade900 : Colors.grey.shade200),
                             child: const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            height: 180,
                             color: Colors.grey.shade800,
-                            child: const Icon(Icons.broken_image, color: Colors.white54),
+                            child: const Icon(
+                              Icons.broken_image,
+                              color: Colors.white54,
+                            ),
                           ),
                         ),
 
-                  // Floating Interactive Heart / Favorite Icon Button
+                  // Bottom Gradient Shadow overlay for text readability
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 70,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withValues(alpha: 0.75),
+                            Colors.black.withValues(alpha: 0.0),
+                          ],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Category Text Overlay at Bottom-Left
+                  Positioned(
+                    left: 12,
+                    bottom: 12,
+                    child: Text(
+                      categoryTag,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Subtly Integrated Heart Icon inside Dark Translucent Overlay at Bottom-Right
+                  Positioned(
+                    right: 10,
+                    bottom: 10,
                     child: BlocBuilder<FavoritesCubit, FavoritesState>(
                       builder: (context, favState) {
-                        final isFav = context.read<FavoritesCubit>().isFavorite(wallpaper.id);
+                        final isFav =
+                            context.read<FavoritesCubit>().isFavorite(wallpaper.id);
 
                         return GestureDetector(
                           onTap: () async {
@@ -85,22 +161,39 @@ class WallpaperCard extends StatelessWidget {
                                 .toggleFavorite(wallpaper);
                             if (context.mounted) {
                               if (isNowFav) {
-                                AppSnackBar.showSuccess(context, 'Added to Favorites! ❤️');
+                                AppSnackBar.showSuccess(
+                                    context, 'Added to Favorites! ❤️');
                               } else {
-                                AppSnackBar.showInfo(context, 'Removed from Favorites.');
+                                AppSnackBar.showInfo(
+                                    context, 'Removed from Favorites.');
                               }
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(6),
+                            width: 32,
+                            height: 32,
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.5),
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                width: 1,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 4,
+                                ),
+                              ],
                             ),
-                            child: Icon(
-                              isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                              color: isFav ? Colors.redAccent : Colors.white,
-                              size: 18,
+                            child: Center(
+                              child: Icon(
+                                isFav
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                color: isFav ? Colors.redAccent : Colors.white,
+                                size: 16,
+                              ),
                             ),
                           ),
                         );
@@ -109,38 +202,7 @@ class WallpaperCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        wallpaper.photographer,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ),
-                    if (wallpaper.likes > 0) ...[
-                      const SizedBox(width: 4),
-                      const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 12),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${wallpaper.likes}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
         ),
       ),

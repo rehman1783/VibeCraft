@@ -26,9 +26,10 @@ class _MainScreenState extends State<MainScreen> {
 
   static final List<Widget> _screens = [
     const HomeFeedScreen(),
-    const AICreatorScreen(),
-    const DownloadsScreen(),
-    const ProfileScreen(),
+    const HomeFeedScreen(), // Explore tab
+    const AICreatorScreen(), // AI Studio center button tab
+    const DownloadsScreen(), // My Art tab
+    const ProfileScreen(), // Profile tab
   ];
 
   @override

@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
 
-/// Displays the app logo/name and a user avatar/profile button.
+/// Redesigned Header Section displaying User Profile avatar, name distinction,
+/// online status indicator, and notification bell icon with active dot marker.
 class HomeTopHeader extends StatelessWidget {
   final String? userAvatarUrl;
   final String? localPhotoPath;
   final String? userName;
   final VoidCallback? onAvatarTap;
+  final VoidCallback? onNotificationTap;
 
   const HomeTopHeader({
     super.key,
@@ -15,9 +17,10 @@ class HomeTopHeader extends StatelessWidget {
     this.localPhotoPath,
     this.userName,
     this.onAvatarTap,
+    this.onNotificationTap,
   });
 
-  ImageProvider? _getAvatarImage() {
+  ImageProvider _getAvatarImage() {
     if (localPhotoPath != null && localPhotoPath!.isNotEmpty) {
       final file = File(localPhotoPath!);
       if (file.existsSync()) {
@@ -27,7 +30,7 @@ class HomeTopHeader extends StatelessWidget {
     if (userAvatarUrl != null && userAvatarUrl!.isNotEmpty) {
       return NetworkImage(userAvatarUrl!);
     }
-    return null;
+    return const AssetImage('assets/images/avatar_marcus.png');
   }
 
   @override
@@ -35,63 +38,181 @@ class HomeTopHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final avatarBg = isDark ? AppColors.surface : AppColors.lightSurface;
-    final iconColor = isDark
-        ? AppColors.textSecondary
-        : AppColors.lightTextSecondary;
+    final nameText = (userName != null && userName!.trim().isNotEmpty)
+        ? userName!.trim()
+        : 'Marcus';
 
-    final avatarImage = _getAvatarImage();
+    final containerBg = isDark
+        ? AppColors.surface.withValues(alpha: 0.7)
+        : AppColors.lightSurface;
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : AppColors.lightBorder;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // App branding
+          // User profile avatar & welcome greetings
           Row(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.secondary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.wallpaper_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+              // Avatar with Online Status Indicator
+              GestureDetector(
+                onTap: onAvatarTap,
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.5),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                            blurRadius: 10,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 24,
+                        backgroundImage: _getAvatarImage(),
+                      ),
+                    ),
+                    // Green Online Status Indicator Dot
+                    Positioned(
+                      right: 1,
+                      bottom: 1,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: AppColors.onlineGreen,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isDark ? AppColors.background : Colors.white,
+                            width: 2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppColors.onlineGreen,
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Text(
-                'VibeCraft',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                ),
+
+              const SizedBox(width: 12),
+
+              // Welcome text hierarchy
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Welcome back,',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.textSecondary
+                          : AppColors.lightTextSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Hello, $nameText',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.textPrimary
+                          : AppColors.lightTextPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
 
-          // Profile avatar
+          // Notification Bell Icon with Active Dot Marker
           GestureDetector(
-            onTap: onAvatarTap,
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: avatarBg,
-              backgroundImage: avatarImage,
-              child: avatarImage == null
-                  ? Icon(Icons.person_rounded, color: iconColor, size: 22)
-                  : null,
+            onTap: onNotificationTap ??
+                () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('No new notifications'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                },
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: containerBg,
+                shape: BoxShape.circle,
+                border: Border.all(color: borderColor),
+                boxShadow: isDark
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_none_rounded,
+                    color: isDark
+                        ? AppColors.textPrimary
+                        : AppColors.lightTextPrimary,
+                    size: 22,
+                  ),
+                  // Active Notification Red Dot Marker
+                  Positioned(
+                    top: 10,
+                    right: 11,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF3B30),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? AppColors.surface : Colors.white,
+                          width: 1.5,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0xFFFF3B30),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

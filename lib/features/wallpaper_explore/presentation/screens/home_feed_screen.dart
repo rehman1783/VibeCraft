@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
 import '../../../profile/presentation/cubit/profile_cubit.dart';
@@ -8,6 +7,7 @@ import '../../../profile/presentation/cubit/profile_state.dart';
 import '../../../../routes.dart';
 import '../cubit/wallpaper_cubit.dart';
 import '../cubit/wallpaper_state.dart';
+import '../widgets/ai_feature_card.dart';
 import '../widgets/category_selector_bar.dart';
 import '../widgets/home_top_header.dart';
 import '../widgets/wallpaper_card.dart';
@@ -87,7 +87,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 state.status == WallpaperStatus.loading && state.wallpapers.isEmpty;
 
             // Determine dynamic section title
-            String sectionTitle = 'Explore Trending';
+            String sectionTitle = 'Daily Picks';
             if (state.currentQuery != null && state.currentQuery!.isNotEmpty) {
               sectionTitle = 'Results for "${state.currentQuery}"';
             } else if (state.selectedCategory != null &&
@@ -104,10 +104,10 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  // Top Header
+                  // 1. Header Section (User Profile)
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                      padding: const EdgeInsets.only(top: 8, left: 16, right: 16),
                       child: BlocBuilder<ProfileCubit, ProfileState>(
                         builder: (context, profileState) {
                           String? photoUrl;
@@ -125,7 +125,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                             localPhotoPath: localPhotoPath,
                             userName: name,
                             onAvatarTap: () {
-                              context.read<NavigationCubit>().selectTab(2);
+                              context.read<NavigationCubit>().selectTab(4); // Profile tab
                             },
                           );
                         },
@@ -133,11 +133,12 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     ),
                   ),
 
-                  // Search Bar
+                  // 2. Search Bar
                   SliverToBoxAdapter(
                     child: WallpaperSearchBar(
                       controller: _searchController,
                       recentSearches: state.recentSearches,
+                      onFilterTap: () => _openFilterModal(context, state),
                       onSubmitted: (query) {
                         context.read<WallpaperCubit>().searchWallpapers(query);
                       },
@@ -147,7 +148,16 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     ),
                   ),
 
-                  // Recent Search History Pills / Suggestions
+                  // 3. AI Feature Callout Card ("Launch Studio")
+                  SliverToBoxAdapter(
+                    child: AIFeatureCard(
+                      onLaunchStudio: () {
+                        context.read<NavigationCubit>().selectTab(2); // AI Studio tab
+                      },
+                    ),
+                  ),
+
+                  // Recent Search History Pills
                   if (state.recentSearches.isNotEmpty)
                     SliverToBoxAdapter(
                       child: Padding(
@@ -161,7 +171,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                 Text(
                                   'Recent Searches',
                                   style: TextStyle(
-                                    color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                                    color: isDark
+                                        ? AppColors.textSecondary
+                                        : AppColors.lightTextSecondary,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -173,7 +185,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                   child: const Text(
                                     'Clear All',
                                     style: TextStyle(
-                                      color: AppColors.primary,
+                                      color: AppColors.electricBlue,
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -204,7 +216,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                       ),
                                       onPressed: () {
                                         _searchController.text = query;
-                                        context.read<WallpaperCubit>().searchWallpapers(query);
+                                        context
+                                            .read<WallpaperCubit>()
+                                            .searchWallpapers(query);
                                       },
                                     ),
                                   );
@@ -216,7 +230,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       ),
                     ),
 
-                  // Category Selector (Max 7 curated chips)
+                  // 4. Categories Section
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8, top: 4),
@@ -289,10 +303,10 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       ),
                     ),
 
-                  // Section Header & Filters Button
+                  // 5. Daily Picks Section Title & Multi-Page Dots Indicator
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -301,19 +315,52 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
-                                ?.copyWith(fontSize: 20, fontWeight: FontWeight.w900),
+                                ?.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  color: isDark
+                                      ? AppColors.textPrimary
+                                      : AppColors.lightTextPrimary,
+                                  letterSpacing: -0.3,
+                                ),
                           ),
-                          TextButton.icon(
-                            onPressed: () => _openFilterModal(context, state),
-                            icon: const Icon(
-                              Icons.tune_rounded,
-                              size: 18,
-                              color: AppColors.primary,
-                            ),
-                            label: const Text(
-                              'Filters',
-                              style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                            ),
+
+                          // Multi-page Indicator (Three small purple dots with an active one)
+                          Row(
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.4),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 14,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.5),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.4),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -323,21 +370,25 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   // Initial Loading Shimmer
                   if (isInitialLoading)
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      sliver: SliverMasonryGrid.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            height: (index % 2 == 0) ? 220 : 280,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          );
-                        },
-                        childCount: 6,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 0.68,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            );
+                          },
+                          childCount: 4,
+                        ),
                       ),
                     ),
 
@@ -377,7 +428,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                   _searchController.clear();
                                   context.read<WallpaperCubit>().clearFilters();
                                 },
-                                child: const Text('Reset Feed', style: TextStyle(color: Colors.white)),
+                                child: const Text('Reset Feed',
+                                    style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -420,10 +472,14 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                                   backgroundColor: AppColors.primary,
                                 ),
                                 onPressed: () {
-                                  context.read<WallpaperCubit>().fetchWallpapers(isRefresh: true);
+                                  context
+                                      .read<WallpaperCubit>()
+                                      .fetchWallpapers(isRefresh: true);
                                 },
-                                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                                label: const Text('Retry', style: TextStyle(color: Colors.white)),
+                                icon: const Icon(Icons.refresh_rounded,
+                                    color: Colors.white),
+                                label: const Text('Retry',
+                                    style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -431,28 +487,33 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       ),
                     ),
 
-                  // Main Wallpaper Grid
+                  // Main Wallpaper 2x2 Clean Grid of Tall Portrait Cards
                   if (state.wallpapers.isNotEmpty)
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      sliver: SliverMasonryGrid.count(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        itemBuilder: (context, index) {
-                          final wallpaperItem = state.wallpapers[index];
-                          return WallpaperCard(
-                            wallpaper: wallpaperItem,
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                AppRoutes.detail,
-                                arguments: wallpaperItem,
-                              );
-                            },
-                          );
-                        },
-                        childCount: state.wallpapers.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: 0.68,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final wallpaperItem = state.wallpapers[index];
+                            return WallpaperCard(
+                              wallpaper: wallpaperItem,
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.detail,
+                                  arguments: wallpaperItem,
+                                );
+                              },
+                            );
+                          },
+                          childCount: state.wallpapers.length,
+                        ),
                       ),
                     ),
 
@@ -465,8 +526,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       ),
                     ),
 
-                  // Bottom padding
-                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                  // Bottom padding for floating navigation bar height
+                  const SliverToBoxAdapter(child: SizedBox(height: 110)),
                 ],
               ),
             );
