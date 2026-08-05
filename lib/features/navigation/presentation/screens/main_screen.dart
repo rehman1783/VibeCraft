@@ -7,6 +7,7 @@ import 'package:vibe_craft/features/ai_creator/presentation/screens/ai_studio_sc
 import 'package:vibe_craft/features/downloads/presentation/screens/downloads_screen.dart';
 import 'package:vibe_craft/features/navigation/presentation/cubit/navigation_cubit.dart';
 import 'package:vibe_craft/features/profile/presentation/screens/profile_screen.dart';
+import 'package:vibe_craft/features/wallpaper_explore/presentation/screens/explore_screen.dart';
 import 'package:vibe_craft/features/wallpaper_explore/presentation/screens/home_feed_screen.dart';
 
 /// Root screen that contains an [IndexedStack] of tab screens and a
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static final List<Widget> _screens = [
     const HomeFeedScreen(),
-    const HomeFeedScreen(), // Explore tab
+    const ExploreScreen(), // Dedicated Explore Tab
     const AICreatorScreen(), // AI Studio center button tab
     const DownloadsScreen(), // My Art tab
     const ProfileScreen(), // Profile tab
