@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 import '../../domain/repositories/wallpaper_repository.dart';
@@ -29,12 +30,18 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     } catch (_) {}
   }
 
-  Future<void> fetchWallpapers({bool isRefresh = false}) async {
+  Future<void> fetchWallpapers({
+    bool isRefresh = false,
+    bool randomize = false,
+  }) async {
     if (!isRefresh && (state.status == WallpaperStatus.loading || state.hasReachedMax)) {
       return;
     }
 
-    final targetPage = isRefresh ? 1 : state.page;
+    int targetPage = isRefresh ? 1 : state.page;
+    if (randomize) {
+      targetPage = 1 + math.Random().nextInt(10);
+    }
     final currentList = isRefresh ? <WallpaperEntity>[] : state.wallpapers;
 
     emit(state.copyWith(
@@ -49,7 +56,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
 
       final query = state.currentQuery;
       final category = state.selectedCategory;
-      final orientation = state.selectedOrientation;
+      final orientation = state.selectedOrientation ?? 'portrait';
       final color = state.selectedColor;
       final sortBy = state.selectedSort;
 
@@ -71,8 +78,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
           color: color,
         );
       } else {
-        if ((orientation != null && orientation.isNotEmpty) ||
-            (color != null && color.isNotEmpty)) {
+        if ((orientation.isNotEmpty) || (color != null && color.isNotEmpty)) {
           newWallpapers = await repository.searchWallpapers(
             query: 'wallpapers',
             page: targetPage,
@@ -86,6 +92,19 @@ class WallpaperCubit extends Cubit<WallpaperState> {
             orderBy: sortBy,
           );
         }
+      }
+
+      // Global Strict Vertical / Portrait Aspect Ratio Filter:
+      // Discard all landscape (width > height) and square (width == height) wallpapers.
+      newWallpapers = newWallpapers.where((w) {
+        if (w.width != null && w.height != null && w.width! > 0 && w.height! > 0) {
+          return w.height! > w.width!;
+        }
+        return true;
+      }).toList();
+
+      if (randomize && newWallpapers.isNotEmpty) {
+        newWallpapers.shuffle(math.Random());
       }
 
       final updatedList = List<WallpaperEntity>.from(currentList)..addAll(newWallpapers);

@@ -50,6 +50,7 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
       final queryParams = <String, dynamic>{
         'page': page,
         'per_page': perPage,
+        'orientation': 'portrait',
       };
       if (orderBy != null && orderBy.isNotEmpty) {
         queryParams['order_by'] = orderBy;
@@ -89,12 +90,12 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
         'query': query,
         'page': page,
         'per_page': perPage,
+        'orientation': (orientation != null && orientation.isNotEmpty)
+            ? orientation
+            : 'portrait',
       };
       if (orderBy != null && orderBy.isNotEmpty) {
         queryParams['order_by'] = orderBy;
-      }
-      if (orientation != null && orientation.isNotEmpty) {
-        queryParams['orientation'] = orientation;
       }
       if (color != null && color.isNotEmpty) {
         queryParams['color'] = color;
@@ -162,10 +163,10 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
       final queryParams = <String, dynamic>{
         'page': page,
         'per_page': perPage,
+        'orientation': (orientation != null && orientation.isNotEmpty)
+            ? orientation
+            : 'portrait',
       };
-      if (orientation != null && orientation.isNotEmpty) {
-        queryParams['orientation'] = orientation;
-      }
 
       final response = await dio.get(
         '${AppConfig.unsplashBaseUrl}/topics/$topicSlug/photos',

@@ -35,8 +35,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NavigationCubit, int>(
-      builder: (context, selectedIndex) {
+    return BlocBuilder<NavigationCubit, NavigationState>(
+      builder: (context, navState) {
+        final selectedIndex = navState.selectedIndex;
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (bool didPop, dynamic result) async {

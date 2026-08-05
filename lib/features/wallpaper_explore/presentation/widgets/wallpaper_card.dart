@@ -37,15 +37,11 @@ class WallpaperCard extends StatelessWidget {
     final isLocalFile = !wallpaper.highResUrl.startsWith('http') &&
         File(wallpaper.highResUrl).existsSync();
 
-    // Determine category tag label
-    String categoryTag = 'MINIMAL';
-    if (wallpaper.altDescription.isNotEmpty &&
-        !wallpaper.altDescription.toLowerCase().contains('vibecraft')) {
-      final words = wallpaper.altDescription.trim().split(' ');
-      if (words.isNotEmpty && words.first.length >= 3) {
-        categoryTag = words.first.toUpperCase();
-      }
-    }
+    // Determine full clean wallpaper title text
+    final String titleText = (wallpaper.altDescription.isNotEmpty &&
+            !wallpaper.altDescription.toLowerCase().contains('vibecraft'))
+        ? wallpaper.altDescription
+        : wallpaper.photographer;
 
     return GestureDetector(
       onTap: onTap,
@@ -114,7 +110,7 @@ class WallpaperCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Colors.black.withValues(alpha: 0.75),
+                            Colors.black.withValues(alpha: 0.85),
                             Colors.black.withValues(alpha: 0.0),
                           ],
                           begin: Alignment.bottomCenter,
@@ -124,20 +120,23 @@ class WallpaperCard extends StatelessWidget {
                     ),
                   ),
 
-                  // Category Text Overlay at Bottom-Left
+                  // Full Wallpaper Title Text Overlay at Bottom-Left
                   Positioned(
                     left: 12,
                     bottom: 12,
+                    right: 48,
                     child: Text(
-                      categoryTag,
+                      titleText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.2,
                         shadows: [
                           Shadow(
-                            color: Colors.black54,
+                            color: Colors.black87,
                             blurRadius: 4,
                           ),
                         ],

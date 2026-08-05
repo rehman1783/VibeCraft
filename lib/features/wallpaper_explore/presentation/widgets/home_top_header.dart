@@ -20,7 +20,7 @@ class HomeTopHeader extends StatelessWidget {
     this.onNotificationTap,
   });
 
-  ImageProvider _getAvatarImage() {
+  ImageProvider? _getAvatarImage() {
     if (localPhotoPath != null && localPhotoPath!.isNotEmpty) {
       final file = File(localPhotoPath!);
       if (file.existsSync()) {
@@ -30,7 +30,7 @@ class HomeTopHeader extends StatelessWidget {
     if (userAvatarUrl != null && userAvatarUrl!.isNotEmpty) {
       return NetworkImage(userAvatarUrl!);
     }
-    return const AssetImage('assets/images/avatar_marcus.png');
+    return null;
   }
 
   @override
@@ -48,6 +48,8 @@ class HomeTopHeader extends StatelessWidget {
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.08)
         : AppColors.lightBorder;
+
+    final avatarImage = _getAvatarImage();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -79,7 +81,19 @@ class HomeTopHeader extends StatelessWidget {
                       ),
                       child: CircleAvatar(
                         radius: 24,
-                        backgroundImage: _getAvatarImage(),
+                        backgroundColor: isDark
+                            ? AppColors.surface
+                            : AppColors.lightSurface,
+                        backgroundImage: avatarImage,
+                        child: avatarImage == null
+                            ? Icon(
+                                Icons.person_rounded,
+                                color: isDark
+                                    ? AppColors.textPrimary
+                                    : AppColors.lightTextPrimary,
+                                size: 24,
+                              )
+                            : null,
                       ),
                     ),
                     // Green Online Status Indicator Dot
