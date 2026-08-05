@@ -131,7 +131,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                               ),
                               const SizedBox(height: 20),
                               const Text(
-                                'Crafting your 8K vertical wallpaper...',
+                                'Translating your thoughts into an 8K wallpaper...',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 16,

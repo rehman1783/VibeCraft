@@ -8,7 +8,11 @@ class AiChatCubit extends Cubit<AiChatState> {
   final Dio _dio;
 
   static const String _systemInstruction =
-      "You are VibeCraft's expert AI Wallpaper Assistant. Help the user refine their creative concept into a vivid, highly detailed visual wallpaper prompt. Keep your replies friendly, concise, and focused on visual styling. Ask if they like the styling concept and offer variations.";
+      "You are VibeCraft AI, a creative, friendly, and intuitive AI Wallpaper Architect. "
+      "Chat with the user naturally—just like standard ChatGPT or Gemini. Listen carefully to their ideas, "
+      "ask refining questions about style, lighting, colors, and mood, and maintain full conversation memory. "
+      "Do not rush to generate images immediately unless the user's idea is complete. "
+      "Once the user confirms they like the concept, synthesize the entire conversation into an extremely detailed visual art prompt.";
 
   AiChatCubit({Dio? dio})
       : _dio = dio ?? Dio(),
@@ -16,7 +20,7 @@ class AiChatCubit extends Cubit<AiChatState> {
           messages: [
             ChatMessageEntity(
               text:
-                  "Hey! I am VibeCraft's AI Wallpaper Assistant powered by Gemini. Tell me what kind of wallpaper you want to create today!",
+                  "Hey! I am VibeCraft AI, your AI Wallpaper Architect. Tell me your wallpaper idea, and we'll refine the style, lighting, and mood together!",
               isUser: false,
             ),
           ],
@@ -39,29 +43,28 @@ class AiChatCubit extends Cubit<AiChatState> {
         'AQ.Ab8RN6InhZzuo4z4WQ9sjHrzMaHCcd99eiMhOpjWUPrxU76DyQ';
 
     String aiResponseText = '';
-    final String defaultOptimizedPrompt =
-        "A high-fidelity vertical 9:16 mobile wallpaper of $trimmedText, highly detailed visual style, vibrant cinematic lighting, 8k resolution --ar 9:16";
 
     try {
-      // Build conversation payload for Gemini
+      // Build full multi-turn conversation payload for Gemini
       final contents = <Map<String, dynamic>>[];
-      
-      // Add system prompt instruction
+
+      // System persona instruction as initial context
       contents.add({
         "role": "user",
         "parts": [{"text": _systemInstruction}]
       });
       contents.add({
         "role": "model",
-        "parts": [{"text": "Understood! I am ready to help you craft an incredible 9:16 vertical wallpaper."}]
+        "parts": [
+          {
+            "text":
+                "Understood! I am VibeCraft AI. I will maintain full context memory, chat naturally, and help refine wallpaper ideas."
+          }
+        ]
       });
 
-      // Add recent message history (last 6 turns for context)
-      final recentHistory = updatedMessages.length > 6
-          ? updatedMessages.sublist(updatedMessages.length - 6)
-          : updatedMessages;
-
-      for (final msg in recentHistory) {
+      // Pass ALL conversation messages in chronological order for full memory
+      for (final msg in updatedMessages) {
         contents.add({
           "role": msg.isUser ? "user" : "model",
           "parts": [{"text": msg.text}]
@@ -92,19 +95,32 @@ class AiChatCubit extends Cubit<AiChatState> {
 
     if (aiResponseText.trim().isEmpty) {
       aiResponseText =
-          "I love this creative direction for \"$trimmedText\"! I've refined the visual details with vibrant lighting and ultra-clear 9:16 depth. Tap ✨ Create Wallpaper below to render your artwork!";
+          "That's a great concept! What style or mood would you prefer for this wallpaper? (e.g. Cyberpunk, Minimalist 3D, Vibrant Anime, or Photorealistic)";
     }
+
+    // Synthesize Master Visual Prompt combining entire conversation history
+    final masterPrompt = _synthesizeMasterPrompt(updatedMessages);
 
     final aiMessage = ChatMessageEntity(
       text: aiResponseText,
       isUser: false,
-      optimizedPrompt: defaultOptimizedPrompt,
+      optimizedPrompt: masterPrompt,
     );
 
     emit(state.copyWith(
       status: AiChatStatus.responseReceived,
       messages: List<ChatMessageEntity>.from(state.messages)..add(aiMessage),
     ));
+  }
+
+  /// Synthesizes full conversation history into a Master Visual Art Prompt (9:16 vertical)
+  String _synthesizeMasterPrompt(List<ChatMessageEntity> history) {
+    final userPreferences = history
+        .where((m) => m.isUser)
+        .map((m) => m.text)
+        .join(', ');
+
+    return "A high-fidelity 9:16 vertical mobile wallpaper of $userPreferences, highly detailed, 8k resolution, cinematic lighting, photorealistic, stylized composition --ar 9:16";
   }
 
   Future<void> generateWallpaper(String prompt) async {
@@ -119,7 +135,6 @@ class AiChatCubit extends Cubit<AiChatState> {
       final generatedImageUrl =
           'https://image.pollinations.ai/prompt/$encodedPrompt?width=720&height=1280&nologo=true&seed=$seed';
 
-      // 2 seconds rendering delay for smooth loading animation
       await Future.delayed(const Duration(seconds: 2));
 
       emit(state.copyWith(
