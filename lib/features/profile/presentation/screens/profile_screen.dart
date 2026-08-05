@@ -10,6 +10,7 @@ import 'package:vibe_craft/features/profile/presentation/cubit/profile_cubit.dar
 import 'package:vibe_craft/features/profile/presentation/cubit/profile_state.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/clear_cache_dialog.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/edit_name_bottom_sheet.dart';
+import 'package:vibe_craft/features/profile/presentation/widgets/logout_dialog.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/profile_header_card.dart';
 import 'package:vibe_craft/features/profile/presentation/widgets/profile_menu_tile.dart';
 import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
@@ -32,36 +33,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _onLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppColors.surface
-            : AppColors.lightSurface,
-        title: const Text(
-          'Logout',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: const Text('Are you sure you want to log out of VibeCraft?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orangeAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.read<AuthCubit>().logout();
-            },
-            child: const Text('Logout'),
-          ),
-        ],
+      builder: (ctx) => LogoutDialog(
+        onConfirm: () {
+          context.read<AuthCubit>().logout();
+        },
       ),
     );
   }
