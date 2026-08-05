@@ -41,15 +41,20 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     }
   }
 
-  void _scrollToTopAndRefresh() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
+  Future<void> _scrollToTopAndRefresh() async {
+    if (_scrollController.hasClients && _scrollController.offset > 0) {
+      await _scrollController.animateTo(
         0,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
       );
     }
-    context.read<WallpaperCubit>().fetchWallpapers(isRefresh: true, randomize: true);
+    if (mounted) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
+      context.read<WallpaperCubit>().fetchWallpapers(isRefresh: true, randomize: true);
+    }
   }
 
   @override
