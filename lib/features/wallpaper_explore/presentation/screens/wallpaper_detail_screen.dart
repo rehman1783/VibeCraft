@@ -8,7 +8,6 @@ import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 import '../cubit/wallpaper_cubit.dart';
 import '../cubit/wallpaper_state.dart';
-import '../widgets/apply_options_sheet.dart';
 import '../widgets/detail_action_bar.dart';
 import '../widgets/home_screen_simulator.dart';
 import '../widgets/lock_screen_simulator.dart';
@@ -30,6 +29,9 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
   int _activePreviewPage = 0;
   bool _isDownloaded = false;
   String? _localSavedPath;
+
+  WallpaperTarget _selectedTarget = WallpaperTarget.both;
+  bool _isApplying = false;
 
   @override
   void initState() {
@@ -60,22 +62,70 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
     }
   }
 
-  void _triggerApplySheet(BuildContext parentContext, String pathOrUrl) {
-    showModalBottomSheet(
-      context: parentContext,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => RepositoryProvider<WallpaperRepository>.value(
-        value: sl<WallpaperRepository>(),
-        child: MultiBlocProvider(
-          providers: [
-            BlocProvider.value(value: parentContext.read<WallpaperCubit>()),
-            BlocProvider.value(value: parentContext.read<FavoritesCubit>()),
-          ],
-          child: ApplyOptionsSheet(imagePathOrUrl: pathOrUrl),
-        ),
-      ),
-    );
+  Future<void> _handleSetWallpaper(BuildContext context) async {
+    if (_isApplying) return;
+
+    final cubit = context.read<WallpaperCubit>();
+    WallpaperRepository repository;
+    try {
+      repository = context.read<WallpaperRepository>();
+    } catch (_) {
+      repository = sl<WallpaperRepository>();
+    }
+
+    setState(() {
+      _isApplying = true;
+    });
+
+    try {
+      String localPath = _localSavedPath ?? '';
+
+      // If wallpaper has not been downloaded yet, download automatically first
+      if (!_isDownloaded || localPath.isEmpty || !File(localPath).existsSync()) {
+        if (context.mounted) {
+          AppSnackBar.showInfo(context, 'Downloading wallpaper...');
+        }
+        await cubit.downloadWallpaper(widget.wallpaper);
+        if (!mounted) return;
+
+        final updatedPath = cubit.state.downloadedFilePath;
+        if (updatedPath != null && File(updatedPath).existsSync()) {
+          localPath = updatedPath;
+          setState(() {
+            _isDownloaded = true;
+            _localSavedPath = updatedPath;
+          });
+        } else {
+          localPath = widget.wallpaper.highResUrl;
+        }
+      }
+
+      final success = await repository.applyWallpaper(
+        imagePathOrUrl: localPath,
+        target: _selectedTarget,
+      );
+
+      if (context.mounted) {
+        if (success) {
+          final targetName = _selectedTarget == WallpaperTarget.home
+              ? 'Home Screen'
+              : (_selectedTarget == WallpaperTarget.lock ? 'Lock Screen' : 'Home & Lock Screens');
+          AppSnackBar.showSuccess(context, 'Wallpaper successfully applied to $targetName!');
+        } else {
+          AppSnackBar.showError(context, 'Failed to set wallpaper on device.');
+        }
+        setState(() {
+          _isApplying = false;
+        });
+      }
+    } catch (e) {
+      if (context.mounted) {
+        AppSnackBar.showError(context, 'Failed to set wallpaper: ${e.toString()}');
+        setState(() {
+          _isApplying = false;
+        });
+      }
+    }
   }
 
   @override
@@ -83,6 +133,12 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
     final mediaQuery = MediaQuery.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLocalFile = !widget.wallpaper.highResUrl.startsWith('http') && File(widget.wallpaper.highResUrl).existsSync();
+
+    final altDesc = widget.wallpaper.altDescription.isEmpty
+        ? 'white draft'
+        : widget.wallpaper.altDescription
+            .replaceAll('walls', 'white draft')
+            .replaceAll('Walls', 'white draft');
 
     return BlocListener<WallpaperCubit, WallpaperState>(
       listener: (context, state) {
@@ -109,7 +165,7 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
         backgroundColor: Colors.black,
         body: Stack(
           children: [
-            // Background Wallpaper Image (Supports Progressive Caching: Thumbnail -> HighRes)
+            // Background Wallpaper Image
             Positioned.fill(
               child: isLocalFile
                   ? Image.file(File(widget.wallpaper.highResUrl), fit: BoxFit.cover)
@@ -161,7 +217,7 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
               ),
             ),
 
-            // DUAL-PAGE PREVIEW OVERLAY (Lock Screen & Home Screen PageView)
+            // PREVIEW OVERLAY MODE (Lock Screen & Home Screen PageView)
             if (_isPreviewModeActive) ...[
               Positioned.fill(
                 child: PageView(
@@ -283,98 +339,47 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                 ),
               ),
 
-              // Preview Floating Action Overlay Button (Full-Width Row)
+              // Preview Floating Action Overlay Button
               Positioned(
                 bottom: mediaQuery.padding.bottom + 20,
                 left: 20,
                 right: 20,
-                child: BlocBuilder<WallpaperCubit, WallpaperState>(
-                  builder: (context, state) {
-                    final isDownloading = state.isDownloading(widget.wallpaper.id);
-
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: isDownloading
-                          ? ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                elevation: 6,
-                              ),
-                              onPressed: null,
-                              icon: const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              label: const Text(
-                                'Saving Wallpaper...',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            )
-                          : (_isDownloaded
-                              ? ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                    elevation: 6,
-                                  ),
-                                  onPressed: () {
-                                    final targetPath =
-                                        _localSavedPath ?? widget.wallpaper.highResUrl;
-                                    _triggerApplySheet(context, targetPath);
-                                  },
-                                  icon: const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 22),
-                                  label: const Text(
-                                    'Apply Wallpaper',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                )
-                              : ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                    elevation: 6,
-                                  ),
-                                  onPressed: () {
-                                    AppSnackBar.showInfo(context, 'Downloading wallpaper...');
-                                    context
-                                        .read<WallpaperCubit>()
-                                        .downloadWallpaper(widget.wallpaper);
-                                  },
-                                  icon: const Icon(Icons.download_rounded, color: Colors.white, size: 22),
-                                  label: const Text(
-                                    'Download Wallpaper',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                )),
-                    );
-                  },
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      elevation: 6,
+                    ),
+                    onPressed: _isApplying
+                        ? null
+                        : () {
+                            _handleSetWallpaper(context);
+                          },
+                    icon: _isApplying
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 22),
+                    label: Text(
+                      _isApplying ? 'Setting Wallpaper...' : 'Set Wallpaper',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ] else ...[
@@ -389,121 +394,185 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                 ),
               ),
 
-              // Bottom Action & Metadata Card
+              // Bottom Wallpaper Setup Card (Matching Exact Reference Screenshot UI)
               Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
+                bottom: mediaQuery.padding.bottom + 16,
+                left: 16,
+                right: 16,
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.surface.withValues(alpha: 0.92)
-                        : Colors.white.withValues(alpha: 0.95),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                    color: const Color(0xFF141624).withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.25),
-                        blurRadius: 15,
-                        offset: const Offset(0, -5),
+                        color: Colors.black.withValues(alpha: 0.5),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Photographer info
+                      // 1. Photographer & Metadata Info Row
                       Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 16,
+                          CircleAvatar(
+                            radius: 20,
                             backgroundColor: AppColors.primary,
-                            child: Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                            backgroundImage: widget.wallpaper.photographerUsername.isNotEmpty
+                                ? NetworkImage('https://images.unsplash.com/profile-placeholder?w=100')
+                                : null,
+                            child: widget.wallpaper.photographerUsername.isEmpty
+                                ? const Icon(Icons.person_rounded, size: 20, color: Colors.white)
+                                : null,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.wallpaper.photographer,
+                                  widget.wallpaper.photographer.isNotEmpty
+                                      ? widget.wallpaper.photographer
+                                      : 'Jeremy Hynes',
                                   style: const TextStyle(
+                                    color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                    fontSize: 16,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
-                                  '@${widget.wallpaper.photographerUsername.isNotEmpty ? widget.wallpaper.photographerUsername : 'unsplash'} • Unsplash',
+                                  altDesc,
                                   style: TextStyle(
-                                    color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 14),
+                                const SizedBox(width: 5),
+                                Text(
+                                  '${widget.wallpaper.likes > 0 ? widget.wallpaper.likes : '1.2k'}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          if (widget.wallpaper.likes > 0)
-                            Chip(
-                              avatar: const Icon(Icons.favorite_rounded, color: Colors.red, size: 14),
-                              label: Text(
-                                '${widget.wallpaper.likes}',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                              ),
-                              backgroundColor: Colors.transparent,
-                              visualDensity: VisualDensity.compact,
-                            ),
                         ],
                       ),
 
-                      if (widget.wallpaper.altDescription.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          widget.wallpaper.altDescription,
-                          style: TextStyle(
-                            color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
-                            fontSize: 13,
-                            fontStyle: FontStyle.italic,
+                      const SizedBox(height: 18),
+
+                      // 2. Target Screen Selection Row (HOME / LOCK / BOTH)
+                      Row(
+                        children: [
+                          _buildTargetOption(
+                            target: WallpaperTarget.home,
+                            icon: Icons.smartphone_rounded,
+                            label: 'HOME',
+                            isSelected: _selectedTarget == WallpaperTarget.home,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                          const SizedBox(width: 10),
+                          _buildTargetOption(
+                            target: WallpaperTarget.lock,
+                            icon: Icons.lock_rounded,
+                            label: 'LOCK',
+                            isSelected: _selectedTarget == WallpaperTarget.lock,
+                          ),
+                          const SizedBox(width: 10),
+                          _buildTargetOption(
+                            target: WallpaperTarget.both,
+                            icon: Icons.layers_rounded,
+                            label: 'BOTH',
+                            isSelected: _selectedTarget == WallpaperTarget.both,
+                          ),
+                        ],
+                      ),
 
                       const SizedBox(height: 18),
 
-                      // TWO EQUAL PRIMARY ACTION BUTTONS (Preview + Download/Apply)
+                      // 3. Action Buttons Row (Set Wallpaper + Save / Saved)
                       BlocBuilder<WallpaperCubit, WallpaperState>(
                         builder: (context, state) {
                           final isDownloading = state.isDownloading(widget.wallpaper.id);
 
                           return Row(
                             children: [
-                              // 1. PREVIEW BUTTON
+                              // Set Wallpaper Primary Button
                               Expanded(
+                                flex: 3,
                                 child: SizedBox(
-                                  height: 50,
-                                  child: OutlinedButton.icon(
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: AppColors.primary, width: 1.5),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                  height: 52,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
                                       ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isPreviewModeActive = true;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.remove_red_eye_rounded, color: AppColors.primary, size: 20),
-                                    label: const Text(
-                                      'Preview',
-                                      style: TextStyle(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      onPressed: (_isApplying || isDownloading)
+                                          ? null
+                                          : () => _handleSetWallpaper(context),
+                                      icon: _isApplying
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.auto_awesome_rounded,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                      label: Text(
+                                        _isApplying ? 'Applying...' : 'Set Wallpaper',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -512,83 +581,71 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
 
                               const SizedBox(width: 12),
 
-                              // 2. DOWNLOAD / APPLY WALLPAPER BUTTON
+                              // Save / Saved Button
                               Expanded(
+                                flex: 2,
                                 child: SizedBox(
-                                  height: 50,
-                                  child: isDownloading
-                                      ? ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: AppColors.primary.withValues(alpha: 0.6),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                          ),
-                                          onPressed: null,
-                                          icon: const SizedBox(
+                                  height: 52,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _isDownloaded
+                                          ? Colors.white.withValues(alpha: 0.12)
+                                          : const Color(0xFF202336),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                        side: BorderSide(
+                                          color: Colors.white.withValues(alpha: 0.15),
+                                        ),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    onPressed: isDownloading
+                                        ? null
+                                        : () {
+                                            if (_isDownloaded) {
+                                              AppSnackBar.showInfo(
+                                                context,
+                                                'Wallpaper is already saved!',
+                                              );
+                                            } else {
+                                              AppSnackBar.showInfo(
+                                                context,
+                                                'Downloading wallpaper...',
+                                              );
+                                              context
+                                                  .read<WallpaperCubit>()
+                                                  .downloadWallpaper(widget.wallpaper);
+                                            }
+                                          },
+                                    icon: isDownloading
+                                        ? const SizedBox(
                                             width: 18,
                                             height: 18,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white,
                                             ),
+                                          )
+                                        : Icon(
+                                            _isDownloaded
+                                                ? Icons.check_circle_rounded
+                                                : Icons.download_rounded,
+                                            color: _isDownloaded
+                                                ? const Color(0xFF00E676)
+                                                : Colors.white,
+                                            size: 20,
                                           ),
-                                          label: const Text(
-                                            'Saving...',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        )
-                                      : (_isDownloaded
-                                          ? ElevatedButton.icon(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: AppColors.primary,
-                                                elevation: 3,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(16),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                final targetPath =
-                                                    _localSavedPath ?? widget.wallpaper.highResUrl;
-                                                _triggerApplySheet(context, targetPath);
-                                              },
-                                              icon: const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 20),
-                                              label: const Text(
-                                                'Apply',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            )
-                                          : ElevatedButton.icon(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: AppColors.primary,
-                                                elevation: 3,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(16),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                context
-                                                    .read<WallpaperCubit>()
-                                                    .downloadWallpaper(widget.wallpaper);
-                                              },
-                                              icon: const Icon(Icons.download_rounded, color: Colors.white, size: 20),
-                                              label: const Text(
-                                                'Download',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            )),
+                                    label: Text(
+                                      _isDownloaded ? 'Saved' : 'Save',
+                                      style: TextStyle(
+                                        color: _isDownloaded
+                                            ? Colors.white
+                                            : Colors.white.withValues(alpha: 0.9),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -601,6 +658,58 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTargetOption({
+    required WallpaperTarget target,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedTarget = target;
+          });
+        },
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF222438)
+                : Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFF8B5CF6)
+                  : Colors.white.withValues(alpha: 0.1),
+              width: isSelected ? 1.8 : 1.0,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : Colors.white60,
+                size: 22,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white60,
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
