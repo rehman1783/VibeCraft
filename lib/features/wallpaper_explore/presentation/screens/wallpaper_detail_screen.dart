@@ -486,16 +486,25 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // 1. Photographer & Metadata Info Row (Clean Default Profile Icon Fallback)
+                      // 1. Photographer & Metadata Info Row (Black/White Profile Logo Icon)
                       Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 20,
-                            backgroundColor: AppColors.primary,
-                            child: Icon(
-                              Icons.person_rounded,
-                              size: 20,
-                              color: Colors.white,
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: const CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.transparent,
+                              child: Icon(
+                                Icons.person_rounded,
+                                size: 20,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
