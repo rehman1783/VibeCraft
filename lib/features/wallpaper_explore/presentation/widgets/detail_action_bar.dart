@@ -8,11 +8,13 @@ import '../../domain/entities/wallpaper_entity.dart';
 class DetailActionBar extends StatelessWidget {
   final WallpaperEntity wallpaper;
   final VoidCallback onBackTap;
+  final VoidCallback? onPreviewTap;
 
   const DetailActionBar({
     super.key,
     required this.wallpaper,
     required this.onBackTap,
+    this.onPreviewTap,
   });
 
   @override
@@ -33,35 +35,55 @@ class DetailActionBar extends StatelessWidget {
           ),
         ),
 
-        // Interactive Heart / Favorite Icon Button
-        BlocBuilder<FavoritesCubit, FavoritesState>(
-          builder: (context, favState) {
-            final isFav = context.read<FavoritesCubit>().isFavorite(wallpaper.id);
-
-            return CircleAvatar(
-              backgroundColor: Colors.black.withValues(alpha: 0.5),
-              radius: 20,
-              child: IconButton(
-                icon: Icon(
-                  isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                  color: isFav ? Colors.redAccent : Colors.white,
-                  size: 20,
+        Row(
+          children: [
+            if (onPreviewTap != null) ...[
+              CircleAvatar(
+                backgroundColor: Colors.black.withValues(alpha: 0.5),
+                radius: 20,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.remove_red_eye_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  onPressed: onPreviewTap,
                 ),
-                onPressed: () async {
-                  final isNowFav = await context
-                      .read<FavoritesCubit>()
-                      .toggleFavorite(wallpaper);
-                  if (context.mounted) {
-                    if (isNowFav) {
-                      AppSnackBar.showSuccess(context, 'Added to Favorites');
-                    } else {
-                      AppSnackBar.showInfo(context, 'Removed from Favorites');
-                    }
-                  }
-                },
               ),
-            );
-          },
+              const SizedBox(width: 10),
+            ],
+
+            // Interactive Heart / Favorite Icon Button
+            BlocBuilder<FavoritesCubit, FavoritesState>(
+              builder: (context, favState) {
+                final isFav = context.read<FavoritesCubit>().isFavorite(wallpaper.id);
+
+                return CircleAvatar(
+                  backgroundColor: Colors.black.withValues(alpha: 0.5),
+                  radius: 20,
+                  child: IconButton(
+                    icon: Icon(
+                      isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      color: isFav ? Colors.redAccent : Colors.white,
+                      size: 20,
+                    ),
+                    onPressed: () async {
+                      final isNowFav = await context
+                          .read<FavoritesCubit>()
+                          .toggleFavorite(wallpaper);
+                      if (context.mounted) {
+                        if (isNowFav) {
+                          AppSnackBar.showSuccess(context, 'Added to Favorites');
+                        } else {
+                          AppSnackBar.showInfo(context, 'Removed from Favorites');
+                        }
+                      }
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
