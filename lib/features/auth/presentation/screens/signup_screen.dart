@@ -550,6 +550,88 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ),
 
+                        const SizedBox(height: 24),
+
+                        // Divider: OR SIGN UP WITH
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: borderColor,
+                                thickness: 1,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OR SIGN UP WITH',
+                                style: TextStyle(
+                                  color: subtitleColor.withValues(alpha: 0.6),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.1,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: borderColor,
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Google Sign In Button
+                        GestureDetector(
+                          onTap: isLoading
+                              ? null
+                              : () => context.read<AuthCubit>().signInWithGoogle(),
+                          child: Container(
+                            height: 52,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: cardBgColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 22,
+                                  height: 22,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      'G',
+                                      style: TextStyle(
+                                        color: Color(0xFF4285F4),
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Continue with Google',
+                                  style: TextStyle(
+                                    color: titleColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
                         const SizedBox(height: 20),
 
                         // Terms & Privacy Policy Disclaimer Text

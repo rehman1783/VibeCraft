@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vibe_craft/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -14,6 +15,7 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
   });
+  Future<UserModel> signInWithGoogle();
   Future<void> syncUserProfile(User user, {String? name});
   Future<UserModel?> getCurrentUser();
   Future<void> signOut();
@@ -58,21 +60,69 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> syncUserProfile(User user, {String? name}) async {
+    final docRef = firestore.collection('users').doc(user.uid);
+    final docSnapshot = await docRef.get();
+
     final Map<String, dynamic> data = {
       'uid': user.uid,
       'email': user.email ?? '',
       'lastLoginAt': FieldValue.serverTimestamp(),
     };
+
+    if (user.photoURL != null && user.photoURL!.isNotEmpty) {
+      data['photoURL'] = user.photoURL;
+    }
+
     if (name != null && name.isNotEmpty) {
       data['displayName'] = name;
     } else if (user.displayName != null && user.displayName!.isNotEmpty) {
       data['displayName'] = user.displayName;
     }
 
-    await firestore
-        .collection('users')
-        .doc(user.uid)
-        .set(data, SetOptions(merge: true));
+    final providerId = user.providerData.isNotEmpty
+        ? user.providerData.first.providerId
+        : 'password';
+    data['authProvider'] = providerId;
+
+    if (!docSnapshot.exists) {
+      data['createdAt'] = FieldValue.serverTimestamp();
+    }
+
+    await docRef.set(data, SetOptions(merge: true));
+  }
+
+  @override
+  Future<UserModel> signInWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser == null) {
+      throw FirebaseAuthException(
+        code: 'ERROR_ABORTED_BY_USER',
+        message: 'Google sign in aborted by user.',
+      );
+    }
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential = await firebaseAuth.signInWithCredential(credential);
+    final user = userCredential.user;
+
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'user-not-found',
+        message: 'Google Sign-In failed to retrieve user account.',
+      );
+    }
+
+    await syncUserProfile(user, name: user.displayName);
+    return UserModel.fromFirebase(user);
   }
 
   @override
@@ -159,13 +209,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final user = credential.user!;
       await user.updateDisplayName(name);
 
-      await firestore.collection('users').doc(user.uid).set({
-        'uid': user.uid,
-        'email': user.email ?? trimmedEmail,
-        'displayName': name,
-        'createdAt': FieldValue.serverTimestamp(),
-        'lastLoginAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      await syncUserProfile(user, name: name);
 
       return UserModel.fromFirebase(user);
     } on FirebaseAuthException catch (e) {
@@ -286,6 +330,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> signOut() async {
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {}
     await firebaseAuth.signOut();
   }
 }
+

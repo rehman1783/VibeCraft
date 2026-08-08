@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -201,7 +202,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  Future<void> deleteAccount({String? password}) async {
+  Future<void> deleteAccount({String? password, bool useGoogle = false}) async {
     emit(ProfileUpdating());
     try {
       final user = _firebaseAuth.currentUser;
@@ -210,25 +211,76 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
 
-      // Re-authenticate if password is provided
-      if (password != null && password.isNotEmpty && user.email != null) {
+      // 1. Handle Re-authentication based on user's selected choice
+      if (useGoogle) {
+        try {
+          final GoogleSignIn googleSignIn = GoogleSignIn();
+          final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+          if (googleUser == null) {
+            emit(const ProfileError('Google re-authentication was cancelled.'));
+            return;
+          }
+          final GoogleSignInAuthentication googleAuth =
+              await googleUser.authentication;
+          final AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          await user.reauthenticateWithCredential(credential);
+        } on FirebaseAuthException catch (e) {
+          emit(
+            ProfileError(
+              e.message ??
+                  'Google re-authentication failed. Please try again.',
+            ),
+          );
+          return;
+        } catch (e) {
+          emit(
+            ProfileError('Google re-authentication failed: ${e.toString()}'),
+          );
+          return;
+        }
+      } else if (password != null && password.isNotEmpty) {
+        if (user.email == null || user.email!.isEmpty) {
+          emit(const ProfileError('No email associated with this account.'));
+          return;
+        }
         try {
           final credential = EmailAuthProvider.credential(
             email: user.email!,
             password: password,
           );
           await user.reauthenticateWithCredential(credential);
-        } catch (_) {}
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+            emit(
+              const ProfileError(
+                'Incorrect password. Account deletion cancelled.',
+              ),
+            );
+          } else {
+            emit(
+              ProfileError(
+                e.message ?? 'Password re-authentication failed.',
+              ),
+            );
+          }
+          return;
+        } catch (e) {
+          emit(ProfileError('Re-authentication failed: ${e.toString()}'));
+          return;
+        }
       }
 
       final uid = user.uid;
 
-      // 1. Delete Firestore doc
+      // 2. Delete Firestore user document
       try {
         await _firestore.collection('users').doc(uid).delete();
       } catch (_) {}
 
-      // 2. Clear all local storage (RAM image cache, temp files, app documents, and SharedPreferences)
+      // 3. Clear all local storage (RAM image cache, temp files, app documents, SharedPreferences)
       try {
         PaintingBinding.instance.imageCache.clear();
         PaintingBinding.instance.imageCache.clearLiveImages();
@@ -269,7 +321,10 @@ class ProfileCubit extends Cubit<ProfileState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      // 3. Delete Firebase Auth user
+      // 4. Delete Firebase Auth user and sign out Google session
+      try {
+        await GoogleSignIn().signOut();
+      } catch (_) {}
       await user.delete();
 
       emit(AccountDeletedSuccess());

@@ -46,6 +46,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<UserEntity> signInWithGoogle() async {
+    try {
+      return await remoteDataSource.signInWithGoogle();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'ERROR_ABORTED_BY_USER') {
+        throw 'Google Sign-In was cancelled.';
+      }
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  @override
   Future<UserEntity?> getCurrentUser() async {
     return await remoteDataSource.getCurrentUser();
   }

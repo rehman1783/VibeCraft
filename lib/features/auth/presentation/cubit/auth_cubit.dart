@@ -39,6 +39,21 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    emit(AuthLoading());
+    try {
+      final user = await authRepository.signInWithGoogle();
+      emit(Authenticated(user));
+    } catch (e) {
+      final errorMsg = e.toString();
+      if (errorMsg.contains('cancelled') || errorMsg.contains('aborted')) {
+        emit(Unauthenticated());
+      } else {
+        emit(AuthError(errorMsg));
+      }
+    }
+  }
+
   Future<void> signUpWithEmail({
     required String name,
     required String email,

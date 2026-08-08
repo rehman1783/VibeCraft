@@ -30,6 +30,9 @@ class MockAuthRepository implements AuthRepository {
   }) => throw UnimplementedError();
 
   @override
+  Future<UserEntity> signInWithGoogle() => throw UnimplementedError();
+
+  @override
   Future<UserEntity?> getCurrentUser() async => user;
 
   @override

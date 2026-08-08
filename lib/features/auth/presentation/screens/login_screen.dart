@@ -39,7 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onSocialAuthPressed(String provider) {
-    AppSnackBar.showInfo(context, '$provider Sign-In will be available soon!');
+    if (provider == 'Google') {
+      context.read<AuthCubit>().signInWithGoogle();
+    } else {
+      AppSnackBar.showInfo(context, '$provider Sign-In will be available soon!');
+    }
   }
 
   @override
@@ -407,7 +411,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Google Button
                             Expanded(
                               child: GestureDetector(
-                                onTap: () => _onSocialAuthPressed('Google'),
+                                onTap: isLoading ? null : () => _onSocialAuthPressed('Google'),
                                 child: Container(
                                   height: 52,
                                   decoration: BoxDecoration(

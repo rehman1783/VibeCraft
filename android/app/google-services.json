@@ -12,7 +12,20 @@
           "package_name": "com.vibecraft.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "197785385774-t4g40o0ik12larhb7nq1tfpnkubsghri.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vibecraft.app",
+            "certificate_hash": "776fb943eaa71dde8222902ace5007fc70fabc14"
+          }
+        },
+        {
+          "client_id": "197785385774-ph777n6rkp2fhb6kcdj51mpb2r01clko.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBsEPc0PqIxinuSVkF8v9AeFfiIdR_K4LY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "197785385774-ph777n6rkp2fhb6kcdj51mpb2r01clko.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
