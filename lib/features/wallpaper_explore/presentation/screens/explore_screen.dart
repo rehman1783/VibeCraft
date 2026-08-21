@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../routes.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
@@ -344,25 +343,28 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                       ),
 
-                      // Initial Loading Shimmer Staggered Masonry Grid
+                      // Initial Loading Shimmer Uniform Grid
                       if (isInitialLoading)
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          sliver: SliverMasonryGrid.count(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            itemBuilder: (context, index) {
-                              final heights = [220.0, 280.0, 240.0, 260.0];
-                              return Container(
-                                height: heights[index % heights.length],
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                              );
-                            },
-                            childCount: 6,
+                          sliver: SliverGrid(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 14,
+                              crossAxisSpacing: 14,
+                              childAspectRatio: 0.68,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                );
+                              },
+                              childCount: 6,
+                            ),
                           ),
                         ),
 
@@ -462,29 +464,34 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           ),
                         ),
 
-                      // 4. Main Content Grid (Pinterest-Style Dynamic 2-Column Staggered Masonry Grid)
+                      // 4. Main Content Grid (Clean Uniform 2-Column Grid with Same Sized Cards)
                       if (state.wallpapers.isNotEmpty)
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          sliver: SliverMasonryGrid.count(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            itemBuilder: (context, index) {
-                              final wallpaperItem = state.wallpapers[index];
-                              return ExploreWallpaperCard(
-                                wallpaper: wallpaperItem,
-                                index: index,
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.detail,
-                                    arguments: wallpaperItem,
-                                  );
-                                },
-                              );
-                            },
-                            childCount: state.wallpapers.length,
+                          sliver: SliverGrid(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 14,
+                              crossAxisSpacing: 14,
+                              childAspectRatio: 0.68,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final wallpaperItem = state.wallpapers[index];
+                                return ExploreWallpaperCard(
+                                  wallpaper: wallpaperItem,
+                                  index: index,
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.detail,
+                                      arguments: wallpaperItem,
+                                    );
+                                  },
+                                );
+                              },
+                              childCount: state.wallpapers.length,
+                            ),
                           ),
                         ),
 

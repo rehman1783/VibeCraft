@@ -53,10 +53,18 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
 
     if (selectedSource == 'unsplash') {
       try {
-        final models = await unsplashRemoteDataSource.getCuratedPhotos(
-          page: page,
-          orderBy: orderBy,
-        );
+        final models = await unsplashRemoteDataSource
+            .getCuratedPhotos(page: page, orderBy: orderBy)
+            .timeout(const Duration(seconds: 12));
+        final list = models.map((m) => m.toEntity()).toList();
+        if (list.isNotEmpty) return list;
+      } catch (_) {
+        // Fallback to Pixabay if Unsplash encounters rate-limits or errors
+      }
+      try {
+        final models = await pixabayRemoteDataSource
+            .getCuratedPhotos(page: page, orderBy: orderBy)
+            .timeout(const Duration(seconds: 12));
         return models.map((m) => m.toEntity()).toList();
       } catch (e) {
         throw ServerFailure(message: e.toString());
@@ -65,17 +73,25 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
 
     if (selectedSource == 'pixabay') {
       try {
-        final models = await pixabayRemoteDataSource.getCuratedPhotos(
-          page: page,
-          orderBy: orderBy,
-        );
+        final models = await pixabayRemoteDataSource
+            .getCuratedPhotos(page: page, orderBy: orderBy)
+            .timeout(const Duration(seconds: 12));
+        final list = models.map((m) => m.toEntity()).toList();
+        if (list.isNotEmpty) return list;
+      } catch (_) {
+        // Fallback to Unsplash if Pixabay fails
+      }
+      try {
+        final models = await unsplashRemoteDataSource
+            .getCuratedPhotos(page: page, orderBy: orderBy)
+            .timeout(const Duration(seconds: 12));
         return models.map((m) => m.toEntity()).toList();
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
     }
 
-    // Default: Aggregate both Unsplash & Pixabay concurrently
+    // Default: Aggregate both Unsplash & Pixabay concurrently with resilient error isolation
     List<WallpaperEntity> unsplashResults = [];
     List<WallpaperEntity> pixabayResults = [];
     Object? lastError;
@@ -83,10 +99,9 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
     await Future.wait([
       (() async {
         try {
-          final models = await unsplashRemoteDataSource.getCuratedPhotos(
-            page: page,
-            orderBy: orderBy,
-          );
+          final models = await unsplashRemoteDataSource
+              .getCuratedPhotos(page: page, orderBy: orderBy)
+              .timeout(const Duration(seconds: 12));
           unsplashResults = models.map((m) => m.toEntity()).toList();
         } catch (e) {
           lastError = e;
@@ -94,10 +109,9 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
       })(),
       (() async {
         try {
-          final models = await pixabayRemoteDataSource.getCuratedPhotos(
-            page: page,
-            orderBy: orderBy,
-          );
+          final models = await pixabayRemoteDataSource
+              .getCuratedPhotos(page: page, orderBy: orderBy)
+              .timeout(const Duration(seconds: 12));
           pixabayResults = models.map((m) => m.toEntity()).toList();
         } catch (e) {
           lastError = e;
@@ -129,13 +143,30 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
 
     if (selectedSource == 'unsplash') {
       try {
-        final models = await unsplashRemoteDataSource.searchPhotos(
-          query: query,
-          page: page,
-          orderBy: orderBy,
-          orientation: orientation,
-          color: color,
-        );
+        final models = await unsplashRemoteDataSource
+            .searchPhotos(
+              query: query,
+              page: page,
+              orderBy: orderBy,
+              orientation: orientation,
+              color: color,
+            )
+            .timeout(const Duration(seconds: 12));
+        final list = models.map((m) => m.toEntity()).toList();
+        if (list.isNotEmpty) return list;
+      } catch (_) {
+        // Fallback to Pixabay if Unsplash fails
+      }
+      try {
+        final models = await pixabayRemoteDataSource
+            .searchPhotos(
+              query: query,
+              page: page,
+              orderBy: orderBy,
+              orientation: orientation,
+              color: color,
+            )
+            .timeout(const Duration(seconds: 12));
         return models.map((m) => m.toEntity()).toList();
       } catch (e) {
         throw ServerFailure(message: e.toString());
@@ -144,20 +175,37 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
 
     if (selectedSource == 'pixabay') {
       try {
-        final models = await pixabayRemoteDataSource.searchPhotos(
-          query: query,
-          page: page,
-          orderBy: orderBy,
-          orientation: orientation,
-          color: color,
-        );
+        final models = await pixabayRemoteDataSource
+            .searchPhotos(
+              query: query,
+              page: page,
+              orderBy: orderBy,
+              orientation: orientation,
+              color: color,
+            )
+            .timeout(const Duration(seconds: 12));
+        final list = models.map((m) => m.toEntity()).toList();
+        if (list.isNotEmpty) return list;
+      } catch (_) {
+        // Fallback to Unsplash if Pixabay fails
+      }
+      try {
+        final models = await unsplashRemoteDataSource
+            .searchPhotos(
+              query: query,
+              page: page,
+              orderBy: orderBy,
+              orientation: orientation,
+              color: color,
+            )
+            .timeout(const Duration(seconds: 12));
         return models.map((m) => m.toEntity()).toList();
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
     }
 
-    // Default: Aggregate both Unsplash & Pixabay concurrently
+    // Default: Aggregate both Unsplash & Pixabay concurrently with resilient error isolation
     List<WallpaperEntity> unsplashResults = [];
     List<WallpaperEntity> pixabayResults = [];
     Object? lastError;
@@ -165,13 +213,15 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
     await Future.wait([
       (() async {
         try {
-          final models = await unsplashRemoteDataSource.searchPhotos(
-            query: query,
-            page: page,
-            orderBy: orderBy,
-            orientation: orientation,
-            color: color,
-          );
+          final models = await unsplashRemoteDataSource
+              .searchPhotos(
+                query: query,
+                page: page,
+                orderBy: orderBy,
+                orientation: orientation,
+                color: color,
+              )
+              .timeout(const Duration(seconds: 12));
           unsplashResults = models.map((m) => m.toEntity()).toList();
         } catch (e) {
           lastError = e;
@@ -179,13 +229,15 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
       })(),
       (() async {
         try {
-          final models = await pixabayRemoteDataSource.searchPhotos(
-            query: query,
-            page: page,
-            orderBy: orderBy,
-            orientation: orientation,
-            color: color,
-          );
+          final models = await pixabayRemoteDataSource
+              .searchPhotos(
+                query: query,
+                page: page,
+                orderBy: orderBy,
+                orientation: orientation,
+                color: color,
+              )
+              .timeout(const Duration(seconds: 12));
           pixabayResults = models.map((m) => m.toEntity()).toList();
         } catch (e) {
           lastError = e;

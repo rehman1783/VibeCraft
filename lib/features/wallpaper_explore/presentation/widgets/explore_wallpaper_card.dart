@@ -39,17 +39,8 @@ class ExploreWallpaperCard extends StatelessWidget {
     final isLocalFile = !wallpaper.highResUrl.startsWith('http') &&
         File(wallpaper.highResUrl).existsSync();
 
-    // Calculate dynamic aspect ratio for Pinterest-style staggered masonry grid
-    double aspectRatio = 0.72;
-    if (wallpaper.width != null && wallpaper.height != null && wallpaper.width! > 0) {
-      aspectRatio = wallpaper.width! / wallpaper.height!;
-      // Clamp aspect ratio between 0.55 and 0.95 for aesthetic harmony
-      aspectRatio = aspectRatio.clamp(0.55, 0.95);
-    } else {
-      // Alternating heights based on index
-      final ratios = [0.65, 0.85, 0.70, 0.80, 0.60];
-      aspectRatio = ratios[index % ratios.length];
-    }
+    // Uniform phone wallpaper aspect ratio for clean visual consistency
+    const double aspectRatio = 0.68;
 
     return GestureDetector(
       onTap: onTap,
