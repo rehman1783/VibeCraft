@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/app_snackbar.dart';
 import '../../../../routes.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
 import '../cubit/wallpaper_cubit.dart';
@@ -12,8 +13,7 @@ import '../widgets/wallpaper_search_bar.dart';
 
 /// The primary discovery and search hub of VibeCraft.
 /// Features a bold Header Area, full-width Search & Filter system,
-/// Featured / Quick Categories chips, and a dynamic 2-column Pinterest-style
-/// staggered masonry grid.
+/// Featured / Quick Categories chips, and a uniform 2-column grid.
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
 
@@ -97,12 +97,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return BlocListener<NavigationCubit, NavigationState>(
-      listener: (context, navState) {
-        if (navState.selectedIndex == 1 && navState.reselectedAt != null) {
-          _scrollToTopAndRefresh();
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<NavigationCubit, NavigationState>(
+          listener: (context, navState) {
+            if (navState.selectedIndex == 1 && navState.reselectedAt != null) {
+              _scrollToTopAndRefresh();
+            }
+          },
+        ),
+        BlocListener<WallpaperCubit, WallpaperState>(
+          listener: (context, state) {
+            if (state.status == WallpaperStatus.failure &&
+                state.wallpapers.isNotEmpty &&
+                state.errorMessage != null) {
+              AppSnackBar.showError(context, state.errorMessage!);
+            }
+          },
+        ),
+      ],
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (bool didPop, dynamic result) async {

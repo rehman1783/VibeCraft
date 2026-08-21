@@ -50,6 +50,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       page: targetPage,
       wallpapers: currentList,
       hasReachedMax: isRefresh ? false : state.hasReachedMax,
+      errorMessage: null,
     ));
 
     try {
@@ -100,8 +101,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         }
       }
 
-      // Global Strict Vertical / Portrait Aspect Ratio Filter:
-      // Discard all landscape (width > height) and square (width == height) wallpapers.
+      // Strict vertical mobile wallpaper filter: Discard non-portrait wallpapers
       newWallpapers = newWallpapers.where((w) {
         if (w.width != null && w.height != null && w.width! > 0 && w.height! > 0) {
           return w.height! > w.width!;
@@ -120,11 +120,24 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         wallpapers: updatedList,
         page: targetPage + 1,
         hasReachedMax: newWallpapers.isEmpty,
+        errorMessage: null,
       ));
     } catch (e) {
+      String msg = 'No Internet Connection. Please check your network and try again.';
+      final str = e.toString().toLowerCase();
+      if (str.contains('rate limit') || str.contains('403') || str.contains('429')) {
+        msg = 'API rate limit reached. Retrying with backup source...';
+      } else if (str.contains('timeout') || str.contains('timed out')) {
+        msg = 'Connection timed out. Please check your network connection.';
+      } else if (str.contains('socket') || str.contains('network') || str.contains('no internet') || str.contains('noactiveinternet')) {
+        msg = 'No Internet Connection. Please check your Wi-Fi or mobile data.';
+      } else if (str.contains('server') || str.contains('500') || str.contains('502') || str.contains('503')) {
+        msg = 'Server temporarily unavailable. Please retry in a moment.';
+      }
+
       emit(state.copyWith(
         status: WallpaperStatus.failure,
-        errorMessage: 'No Internet Connection. Please check your network and try again.',
+        errorMessage: msg,
       ));
     }
   }
@@ -208,14 +221,22 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         downloadingIds: finishedDownloadingIds,
         lastDownloadedId: wallpaper.id,
         downloadedFilePath: savedPath,
+        errorMessage: null,
       ));
     } catch (e) {
       final finishedDownloadingIds = Set<String>.from(state.downloadingIds)..remove(wallpaper.id);
+      String msg = 'Download failed. Please check your internet connection.';
+      final str = e.toString().toLowerCase();
+      if (str.contains('socket') || str.contains('network') || str.contains('no internet')) {
+        msg = 'Download failed: No Internet Connection.';
+      } else if (str.contains('permission') || str.contains('storage')) {
+        msg = 'Download failed: Storage permission required.';
+      }
       emit(state.copyWith(
         downloadStatus: WallpaperDownloadStatus.failure,
         downloadingIds: finishedDownloadingIds,
         lastFailedId: wallpaper.id,
-        errorMessage: 'Download failed: No Internet Connection. Please check your network and try again.',
+        errorMessage: msg,
       ));
     }
   }
@@ -224,14 +245,20 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     required String imagePathOrUrl,
     required WallpaperTarget target,
   }) async {
-    emit(state.copyWith(applyStatus: WallpaperApplyStatus.applying));
+    emit(state.copyWith(
+      applyStatus: WallpaperApplyStatus.applying,
+      errorMessage: null,
+    ));
     try {
       final success = await repository.applyWallpaper(
         imagePathOrUrl: imagePathOrUrl,
         target: target,
       );
       if (success) {
-        emit(state.copyWith(applyStatus: WallpaperApplyStatus.success));
+        emit(state.copyWith(
+          applyStatus: WallpaperApplyStatus.success,
+          errorMessage: null,
+        ));
       } else {
         emit(state.copyWith(
           applyStatus: WallpaperApplyStatus.failure,
@@ -239,9 +266,14 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         ));
       }
     } catch (e) {
+      String msg = 'Could not set wallpaper on this device.';
+      final str = e.toString().toLowerCase();
+      if (str.contains('permission')) {
+        msg = 'Permission required to change device wallpaper.';
+      }
       emit(state.copyWith(
         applyStatus: WallpaperApplyStatus.failure,
-        errorMessage: e.toString(),
+        errorMessage: msg,
       ));
     }
   }
@@ -264,6 +296,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       clearLastDownloadedId: true,
       clearLastFailedId: true,
       downloadedFilePath: null,
+      errorMessage: null,
     ));
   }
 }

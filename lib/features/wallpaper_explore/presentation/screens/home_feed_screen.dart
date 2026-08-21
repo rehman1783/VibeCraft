@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/app_snackbar.dart';
 import '../../../navigation/presentation/cubit/navigation_cubit.dart';
 import '../../../profile/presentation/cubit/profile_cubit.dart';
 import '../../../profile/presentation/cubit/profile_state.dart';
@@ -68,12 +69,25 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return BlocListener<NavigationCubit, NavigationState>(
-      listener: (context, navState) {
-        if (navState.selectedIndex == 0 && navState.reselectedAt != null) {
-          _scrollToTopAndRefresh();
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<NavigationCubit, NavigationState>(
+          listener: (context, navState) {
+            if (navState.selectedIndex == 0 && navState.reselectedAt != null) {
+              _scrollToTopAndRefresh();
+            }
+          },
+        ),
+        BlocListener<WallpaperCubit, WallpaperState>(
+          listener: (context, state) {
+            if (state.status == WallpaperStatus.failure &&
+                state.wallpapers.isNotEmpty &&
+                state.errorMessage != null) {
+              AppSnackBar.showError(context, state.errorMessage!);
+            }
+          },
+        ),
+      ],
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (bool didPop, dynamic result) async {
