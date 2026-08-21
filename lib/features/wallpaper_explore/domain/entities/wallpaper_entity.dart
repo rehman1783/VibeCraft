@@ -11,6 +11,7 @@ class WallpaperEntity {
   final int likes;
   final int? width;
   final int? height;
+  final String source; // e.g. 'Unsplash', 'Pixabay', 'AI Studio'
 
   const WallpaperEntity({
     required this.id,
@@ -25,6 +26,7 @@ class WallpaperEntity {
     this.likes = 0,
     this.width,
     this.height,
+    this.source = 'Unsplash',
   });
 
   Map<String, dynamic> toJson() {
@@ -41,6 +43,7 @@ class WallpaperEntity {
       'likes': likes,
       'width': width,
       'height': height,
+      'source': source,
     };
   }
 
@@ -50,7 +53,7 @@ class WallpaperEntity {
       thumbnailUrl: json['thumbnailUrl'] as String? ?? '',
       highResUrl: json['highResUrl'] as String? ?? '',
       rawUrl: json['rawUrl'] as String? ?? '',
-      photographer: json['photographer'] as String? ?? 'Unsplash Artist',
+      photographer: json['photographer'] as String? ?? 'VibeCraft Artist',
       photographerUsername: json['photographerUsername'] as String? ?? '',
       altDescription:
           json['altDescription'] as String? ?? 'VibeCraft Wallpaper',
@@ -59,6 +62,7 @@ class WallpaperEntity {
       likes: (json['likes'] as num?)?.toInt() ?? 0,
       width: (json['width'] as num?)?.toInt(),
       height: (json['height'] as num?)?.toInt(),
+      source: json['source'] as String? ?? 'Unsplash',
     );
   }
 }

@@ -53,6 +53,7 @@ class MockWallpaperRepository implements WallpaperRepository {
   Future<List<WallpaperEntity>> getCuratedWallpapers({
     required int page,
     String? orderBy,
+    String? source,
   }) async => [];
 
   @override
@@ -62,6 +63,7 @@ class MockWallpaperRepository implements WallpaperRepository {
     String? orderBy,
     String? orientation,
     String? color,
+    String? source,
   }) async => [];
 
   @override

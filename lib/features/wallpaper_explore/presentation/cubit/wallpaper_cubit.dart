@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 import '../../domain/repositories/wallpaper_repository.dart';
 import '../../../search/data/datasources/search_local_data_source.dart';
+import '../widgets/category_selector_bar.dart';
 import 'wallpaper_state.dart';
 
 class WallpaperCubit extends Cubit<WallpaperState> {
@@ -59,6 +60,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       final orientation = state.selectedOrientation ?? 'portrait';
       final color = state.selectedColor;
       final sortBy = state.selectedSort;
+      final source = state.selectedSource;
 
       if (query != null && query.isNotEmpty) {
         newWallpapers = await repository.searchWallpapers(
@@ -67,15 +69,17 @@ class WallpaperCubit extends Cubit<WallpaperState> {
           orderBy: sortBy,
           orientation: orientation,
           color: color,
+          source: source,
         );
       } else if (category != null && category.isNotEmpty) {
-        final categoryQuery = (category == '3D') ? '3D wallpapers' : category;
+        final categoryQuery = AppCategories.getSearchQueryForCategory(category);
         newWallpapers = await repository.searchWallpapers(
           query: categoryQuery,
           page: targetPage,
           orderBy: sortBy,
           orientation: orientation,
           color: color,
+          source: source,
         );
       } else {
         if ((orientation.isNotEmpty) || (color != null && color.isNotEmpty)) {
@@ -85,11 +89,13 @@ class WallpaperCubit extends Cubit<WallpaperState> {
             orderBy: sortBy,
             orientation: orientation,
             color: color,
+            source: source,
           );
         } else {
           newWallpapers = await repository.getCuratedWallpapers(
             page: targetPage,
             orderBy: sortBy,
+            source: source,
           );
         }
       }
@@ -160,6 +166,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     String? orientation,
     String? color,
     String? sortBy,
+    String? source,
   }) async {
     emit(state.copyWith(
       selectedOrientation: orientation,
@@ -167,6 +174,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       selectedColor: color,
       clearColor: color == null,
       selectedSort: sortBy ?? state.selectedSort,
+      selectedSource: source ?? state.selectedSource,
     ));
     await fetchWallpapers(isRefresh: true);
   }
@@ -176,6 +184,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       clearOrientation: true,
       clearColor: true,
       selectedSort: 'popular',
+      selectedSource: 'all',
     ));
     await fetchWallpapers(isRefresh: true);
   }

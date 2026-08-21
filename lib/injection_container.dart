@@ -10,6 +10,7 @@ import 'features/favorites/data/repositories/favorites_repository_impl.dart';
 import 'features/favorites/domain/repositories/favorites_repository.dart';
 import 'features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'features/search/data/datasources/search_local_data_source.dart';
+import 'features/wallpaper_explore/data/datasources/pixabay_remote_source.dart';
 import 'features/wallpaper_explore/data/datasources/unsplash_remote_source.dart';
 import 'features/wallpaper_explore/data/datasources/wallpaper_local_data_source.dart';
 import 'features/wallpaper_explore/data/repositories/wallpaper_repository_impl.dart';
@@ -57,6 +58,10 @@ Future<void> initDependencyInjection() async {
     () => UnsplashRemoteDataSourceImpl(dio: sl<Dio>()),
   );
 
+  sl.registerLazySingleton<PixabayRemoteDataSource>(
+    () => PixabayRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
   sl.registerLazySingleton<WallpaperLocalDataSource>(
     () => WallpaperLocalDataSourceImpl(
       sharedPreferences: sl<SharedPreferences>(),
@@ -71,7 +76,8 @@ Future<void> initDependencyInjection() async {
 
   sl.registerLazySingleton<WallpaperRepository>(
     () => WallpaperRepositoryImpl(
-      remoteDataSource: sl<UnsplashRemoteDataSource>(),
+      unsplashRemoteDataSource: sl<UnsplashRemoteDataSource>(),
+      pixabayRemoteDataSource: sl<PixabayRemoteDataSource>(),
       localDataSource: sl<WallpaperLocalDataSource>(),
       networkInfo: sl<NetworkInfo>(),
       wallpaperService: sl<WallpaperService>(),

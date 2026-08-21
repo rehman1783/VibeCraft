@@ -15,6 +15,7 @@ class WallpaperState {
   final String? selectedOrientation; // portrait, landscape, squarish
   final String? selectedColor; // black_and_white, black, white, red, blue, green, etc.
   final String selectedSort; // popular, latest, relevant
+  final String selectedSource; // all, unsplash, pixabay
   final List<UnsplashTopicModel> topics;
   final WallpaperDownloadStatus downloadStatus;
   final Set<String> downloadingIds;
@@ -36,6 +37,7 @@ class WallpaperState {
     this.selectedOrientation,
     this.selectedColor,
     this.selectedSort = 'popular',
+    this.selectedSource = 'all',
     this.topics = const [],
     this.downloadStatus = WallpaperDownloadStatus.initial,
     this.downloadingIds = const {},
@@ -64,6 +66,7 @@ class WallpaperState {
     String? selectedColor,
     bool clearColor = false,
     String? selectedSort,
+    String? selectedSource,
     List<UnsplashTopicModel>? topics,
     WallpaperDownloadStatus? downloadStatus,
     Set<String>? downloadingIds,
@@ -87,6 +90,7 @@ class WallpaperState {
       selectedOrientation: clearOrientation ? null : (selectedOrientation ?? this.selectedOrientation),
       selectedColor: clearColor ? null : (selectedColor ?? this.selectedColor),
       selectedSort: selectedSort ?? this.selectedSort,
+      selectedSource: selectedSource ?? this.selectedSource,
       topics: topics ?? this.topics,
       downloadStatus: downloadStatus ?? this.downloadStatus,
       downloadingIds: downloadingIds ?? this.downloadingIds,

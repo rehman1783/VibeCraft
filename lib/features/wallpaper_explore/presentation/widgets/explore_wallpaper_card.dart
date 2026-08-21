@@ -108,6 +108,47 @@ class ExploreWallpaperCard extends StatelessWidget {
                           ),
                         ),
 
+                  // Top-Left Source Badge (Unsplash / Pixabay)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.55),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            wallpaper.source.toLowerCase() == 'pixabay'
+                                ? Icons.palette_outlined
+                                : Icons.camera_alt_outlined,
+                            size: 10,
+                            color: wallpaper.source.toLowerCase() == 'pixabay'
+                                ? AppColors.electricBlue
+                                : Colors.white70,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            wallpaper.source,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   // Bottom Gradient Overlay for typography readability
                   Positioned(
                     left: 0,

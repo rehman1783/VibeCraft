@@ -70,11 +70,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
         initialOrientation: state.selectedOrientation,
         initialColor: state.selectedColor,
         initialSortBy: state.selectedSort,
-        onApply: ({color, orientation, sortBy}) {
+        initialSource: state.selectedSource,
+        onApply: ({color, orientation, sortBy, source}) {
           context.read<WallpaperCubit>().applyFilters(
                 orientation: orientation,
                 color: color,
                 sortBy: sortBy,
+                source: source,
               );
         },
         onReset: () {
@@ -229,10 +231,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                       ),
 
-                      // Active Filters Chips Bar (if orientation/color/sort applied)
+                      // Active Filters Chips Bar (if orientation/color/sort/source applied)
                       if (state.selectedOrientation != null ||
                           state.selectedColor != null ||
-                          state.selectedSort != 'popular')
+                          state.selectedSort != 'popular' ||
+                          state.selectedSource != 'all')
                         SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -240,6 +243,22 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
+                                  if (state.selectedSource != 'all')
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 6),
+                                      child: Chip(
+                                        label: Text('Source: ${state.selectedSource.toUpperCase()}'),
+                                        onDeleted: () {
+                                          context.read<WallpaperCubit>().applyFilters(
+                                                orientation: state.selectedOrientation,
+                                                color: state.selectedColor,
+                                                sortBy: state.selectedSort,
+                                                source: 'all',
+                                              );
+                                        },
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ),
                                   if (state.selectedOrientation != null)
                                     Padding(
                                       padding: const EdgeInsets.only(right: 6),
@@ -249,6 +268,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           context.read<WallpaperCubit>().applyFilters(
                                                 color: state.selectedColor,
                                                 sortBy: state.selectedSort,
+                                                source: state.selectedSource,
                                               );
                                         },
                                         visualDensity: VisualDensity.compact,
@@ -263,6 +283,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           context.read<WallpaperCubit>().applyFilters(
                                                 orientation: state.selectedOrientation,
                                                 sortBy: state.selectedSort,
+                                                source: state.selectedSource,
                                               );
                                         },
                                         visualDensity: VisualDensity.compact,
@@ -278,6 +299,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                                 orientation: state.selectedOrientation,
                                                 color: state.selectedColor,
                                                 sortBy: 'popular',
+                                                source: state.selectedSource,
                                               );
                                         },
                                         visualDensity: VisualDensity.compact,

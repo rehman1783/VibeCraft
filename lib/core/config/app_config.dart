@@ -22,4 +22,14 @@ class AppConfig {
         'Authorization': 'Client-ID $unsplashAccessKey',
         'Accept-Version': 'v1',
       };
+
+  static String get pixabayApiKey {
+    return dotenv.env['PIXABAY_API_Key'] ??
+        dotenv.env['PIXABAY_API_KEY'] ??
+        '56960138-8f6838837d6391021984504e9';
+  }
+
+  static String get pixabayBaseUrl {
+    return dotenv.env['PIXABAY_BASE_URL'] ?? 'https://pixabay.com/api/';
+  }
 }

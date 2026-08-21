@@ -537,37 +537,70 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                               ],
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.favorite_rounded,
-                                  color: Colors.redAccent,
-                                  size: 14,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
                                 ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  '${widget.wallpaper.likes > 0 ? widget.wallpaper.likes : '1.2k'}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                decoration: BoxDecoration(
+                                  color: widget.wallpaper.source.toLowerCase() == 'pixabay'
+                                      ? AppColors.electricBlue.withValues(alpha: 0.18)
+                                      : Colors.white.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: widget.wallpaper.source.toLowerCase() == 'pixabay'
+                                        ? AppColors.electricBlue.withValues(alpha: 0.4)
+                                        : Colors.white.withValues(alpha: 0.15),
                                   ),
                                 ),
-                              ],
-                            ),
+                                child: Text(
+                                  widget.wallpaper.source,
+                                  style: TextStyle(
+                                    color: widget.wallpaper.source.toLowerCase() == 'pixabay'
+                                        ? AppColors.electricBlue
+                                        : Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.favorite_rounded,
+                                      color: Colors.redAccent,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      '${widget.wallpaper.likes > 0 ? widget.wallpaper.likes : '1.2k'}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

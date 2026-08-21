@@ -7,6 +7,7 @@ abstract class WallpaperRepository {
   Future<List<WallpaperEntity>> getCuratedWallpapers({
     required int page,
     String? orderBy,
+    String? source,
   });
 
   Future<List<WallpaperEntity>> searchWallpapers({
@@ -15,6 +16,7 @@ abstract class WallpaperRepository {
     String? orderBy,
     String? orientation,
     String? color,
+    String? source,
   });
 
   Future<List<UnsplashTopicModel>> getTopics();

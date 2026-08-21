@@ -14,6 +14,7 @@ class UnsplashWallpaperModel extends WallpaperEntity {
     super.likes,
     super.width,
     super.height,
+    super.source = 'Unsplash',
   });
 
   factory UnsplashWallpaperModel.fromJson(Map<String, dynamic> json) {
@@ -61,6 +62,7 @@ class UnsplashWallpaperModel extends WallpaperEntity {
       likes: (json['likes'] as num?)?.toInt() ?? 0,
       width: (json['width'] as num?)?.toInt(),
       height: (json['height'] as num?)?.toInt(),
+      source: 'Unsplash',
     );
   }
 
@@ -78,6 +80,7 @@ class UnsplashWallpaperModel extends WallpaperEntity {
       likes: likes,
       width: width,
       height: height,
+      source: 'Unsplash',
     );
   }
 }

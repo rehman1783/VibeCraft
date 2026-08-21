@@ -5,10 +5,12 @@ class WallpaperFilterDialog extends StatefulWidget {
   final String? initialOrientation;
   final String? initialColor;
   final String initialSortBy;
+  final String initialSource;
   final Function({
     String? orientation,
     String? color,
     String? sortBy,
+    String? source,
   }) onApply;
   final VoidCallback onReset;
 
@@ -17,6 +19,7 @@ class WallpaperFilterDialog extends StatefulWidget {
     this.initialOrientation,
     this.initialColor,
     required this.initialSortBy,
+    this.initialSource = 'all',
     required this.onApply,
     required this.onReset,
   });
@@ -29,6 +32,13 @@ class _WallpaperFilterDialogState extends State<WallpaperFilterDialog> {
   late String? _selectedOrientation;
   late String? _selectedColor;
   late String _selectedSortBy;
+  late String _selectedSource;
+
+  final List<Map<String, String>> _sources = [
+    {'label': 'All Sources 🌐', 'value': 'all'},
+    {'label': 'Unsplash 📸', 'value': 'unsplash'},
+    {'label': 'Pixabay 🎨', 'value': 'pixabay'},
+  ];
 
   final List<Map<String, String?>> _orientations = [
     {'label': 'All', 'value': null},
@@ -63,6 +73,7 @@ class _WallpaperFilterDialogState extends State<WallpaperFilterDialog> {
     _selectedOrientation = widget.initialOrientation;
     _selectedColor = widget.initialColor;
     _selectedSortBy = widget.initialSortBy;
+    _selectedSource = widget.initialSource;
   }
 
   @override
@@ -98,6 +109,7 @@ class _WallpaperFilterDialogState extends State<WallpaperFilterDialog> {
                       _selectedOrientation = null;
                       _selectedColor = null;
                       _selectedSortBy = 'popular';
+                      _selectedSource = 'all';
                     });
                     widget.onReset();
                     Navigator.pop(context);
@@ -105,6 +117,26 @@ class _WallpaperFilterDialogState extends State<WallpaperFilterDialog> {
                   child: const Text('Reset All', style: TextStyle(color: AppColors.primary)),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+
+            // Provider / Source Selector
+            Text('Source Provider', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _sources.map((opt) {
+                final isSelected = _selectedSource == opt['value'];
+                return ChoiceChip(
+                  label: Text(opt['label']!),
+                  selected: isSelected,
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  onSelected: (val) {
+                    setState(() => _selectedSource = opt['value']!);
+                  },
+                );
+              }).toList(),
             ),
             const SizedBox(height: 16),
 
@@ -194,6 +226,7 @@ class _WallpaperFilterDialogState extends State<WallpaperFilterDialog> {
                     orientation: _selectedOrientation,
                     color: _selectedColor,
                     sortBy: _selectedSortBy,
+                    source: _selectedSource,
                   );
                   Navigator.pop(context);
                 },
