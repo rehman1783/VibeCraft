@@ -27,14 +27,27 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
   });
 
   List<WallpaperEntity> _interleave(
-    List<WallpaperEntity> a,
-    List<WallpaperEntity> b,
+    List<WallpaperEntity> unsplashList,
+    List<WallpaperEntity> pixabayList,
   ) {
+    if (unsplashList.isEmpty) return pixabayList;
+    if (pixabayList.isEmpty) return unsplashList;
+
     final result = <WallpaperEntity>[];
-    final maxLen = a.length > b.length ? a.length : b.length;
-    for (int i = 0; i < maxLen; i++) {
-      if (i < a.length) result.add(a[i]);
-      if (i < b.length) result.add(b[i]);
+    int u = 0;
+    int p = 0;
+
+    // Prioritize Unsplash (2 Unsplash items for every 1 Pixabay item)
+    while (u < unsplashList.length || p < pixabayList.length) {
+      if (u < unsplashList.length) {
+        result.add(unsplashList[u++]);
+      }
+      if (u < unsplashList.length) {
+        result.add(unsplashList[u++]);
+      }
+      if (p < pixabayList.length) {
+        result.add(pixabayList[p++]);
+      }
     }
     return result;
   }
