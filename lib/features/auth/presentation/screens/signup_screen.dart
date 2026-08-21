@@ -79,6 +79,13 @@ class _SignupScreenState extends State<SignupScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
+          final userName = (state.user.name != null && state.user.name!.isNotEmpty)
+              ? state.user.name!
+              : 'VibeCrafter';
+          AppSnackBar.showSuccess(
+            context,
+            'Account created successfully! Welcome, $userName! 🚀',
+          );
           Navigator.pushNamedAndRemoveUntil(
             context,
             AppRoutes.home,

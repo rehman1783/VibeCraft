@@ -67,6 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
+          final userName = (state.user.name != null && state.user.name!.isNotEmpty)
+              ? state.user.name!
+              : 'VibeCrafter';
+          AppSnackBar.showSuccess(context, 'Welcome back, $userName! ✨');
           Navigator.pushReplacementNamed(context, AppRoutes.home);
         } else if (state is AuthError) {
           AppSnackBar.showError(context, state.message);

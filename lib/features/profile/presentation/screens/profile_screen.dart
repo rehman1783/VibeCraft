@@ -65,6 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is Unauthenticated) {
+              AppSnackBar.showInfo(context, 'Signed out successfully.');
               Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);

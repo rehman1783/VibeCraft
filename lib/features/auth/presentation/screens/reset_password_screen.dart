@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/utils/app_snackbar.dart';
 import 'package:vibe_craft/core/widgets/vibe_button.dart';
 import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
@@ -33,46 +34,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (newPassword.isEmpty || confirmPassword.isEmpty) {
-      _showSnackBar('Please fill in both password fields.');
+      AppSnackBar.showError(context, 'Please fill in both password fields.');
       return;
     }
 
     if (newPassword.length < 6) {
-      _showSnackBar('Password must be at least 6 characters long.');
+      AppSnackBar.showError(context, 'Password must be at least 6 characters long.');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      _showSnackBar('Passwords do not match. Please re-enter.');
+      AppSnackBar.showError(context, 'Passwords do not match. Please re-enter.');
       return;
     }
 
     context.read<AuthCubit>().resetPassword(newPassword: newPassword);
-  }
-
-  void _showSnackBar(String message, {bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: AppColors.surface,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: isSuccess
-                ? AppColors.primary
-                : AppColors.secondary.withValues(alpha: 0.6),
-            width: 1.5,
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -87,9 +63,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is PasswordResetSuccess || state is Authenticated) {
-            _showSnackBar(
-              'Password has been successfully changed!',
-              isSuccess: true,
+            AppSnackBar.showSuccess(
+              context,
+              'Password has been successfully changed! ✨',
             );
             Navigator.pushNamedAndRemoveUntil(
               context,
@@ -97,7 +73,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               (route) => false,
             );
           } else if (state is AuthError) {
-            _showSnackBar(state.message);
+            AppSnackBar.showError(context, state.message);
           }
         },
         builder: (context, state) {

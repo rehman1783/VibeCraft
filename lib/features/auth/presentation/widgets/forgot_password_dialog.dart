@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/utils/app_snackbar.dart';
 import 'package:vibe_craft/core/widgets/vibe_button.dart';
 import 'package:vibe_craft/core/widgets/vibe_text_field.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
@@ -28,25 +29,9 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   void _onContinuePressed() {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Please enter your registered email address.',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          backgroundColor: AppColors.surface,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(
-              color: AppColors.secondary.withValues(alpha: 0.6),
-              width: 1.5,
-            ),
-          ),
-        ),
+      AppSnackBar.showError(
+        context,
+        'Please enter your registered email address.',
       );
       return;
     }
@@ -84,32 +69,17 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               listener: (context, state) {
                 if (state is PasswordResetEmailSent) {
                   Navigator.of(context).pop(); // Close dialog
+                  AppSnackBar.showSuccess(
+                    context,
+                    'Password reset email sent! Check your inbox 📧',
+                  );
                   Navigator.pushNamed(
                     context,
                     AppRoutes.forgotPasswordSent,
                     arguments: state.email,
                   );
                 } else if (state is AuthError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        state.message,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      backgroundColor: AppColors.surface,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: AppColors.secondary.withValues(alpha: 0.6),
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  );
+                  AppSnackBar.showError(context, state.message);
                 }
               },
               builder: (context, state) {

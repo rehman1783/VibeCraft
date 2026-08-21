@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
+import 'package:vibe_craft/core/utils/app_snackbar.dart';
 import 'package:vibe_craft/core/widgets/vibe_button.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
@@ -72,25 +73,9 @@ class _ForgotPasswordSentScreenState extends State<ForgotPasswordSentScreen>
 
   void _onResendPressed() {
     context.read<AuthCubit>().sendPasswordResetEmail(widget.email);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Password reset email re-sent! Please check your inbox.',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: AppColors.surface,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.6),
-            width: 1.5,
-          ),
-        ),
-      ),
+    AppSnackBar.showSuccess(
+      context,
+      'Password reset email re-sent! Please check your inbox. 📧',
     );
   }
 
