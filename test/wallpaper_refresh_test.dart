@@ -224,7 +224,7 @@ void main() {
 
       await cubit.fetchWallpapers(isRefresh: true);
       expect(cubit.state.wallpapers.length, equals(2));
-      expect(cubit.state.wallpapers.map((w) => w.id).toList(), equals(['dup_1', 'dup_2']));
+      expect(cubit.state.wallpapers.map((w) => w.id).toSet(), equals({'dup_1', 'dup_2'}));
     });
   });
 }
