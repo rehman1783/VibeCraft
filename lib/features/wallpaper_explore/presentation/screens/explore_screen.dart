@@ -32,7 +32,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<WallpaperCubit>();
       if (cubit.state.wallpapers.isEmpty) {
-        cubit.fetchWallpapers(isRefresh: true);
+        cubit.fetchWallpapers(isRefresh: true, randomize: true);
       }
     });
   }

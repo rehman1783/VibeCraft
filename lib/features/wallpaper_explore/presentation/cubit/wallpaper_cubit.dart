@@ -10,6 +10,35 @@ class WallpaperCubit extends Cubit<WallpaperState> {
   final WallpaperRepository repository;
   final SearchLocalDataSource searchLocalDataSource;
 
+  // Curated diverse high-aesthetic themes for Daily Picks to ensure fresh, dynamic wallpapers
+  static const List<String> _dailyPickThemes = [
+    'aesthetic wallpaper 4k',
+    'cinematic moody portrait',
+    'minimalist amoled dark',
+    'deep space galaxy nebula',
+    'cyberpunk neon city night',
+    'stunning nature landscape vertical',
+    '3d abstract render fluid',
+    'ocean waves aerial aesthetic',
+    'dark atmospheric landscape',
+    'modern architecture minimal',
+    'vibrant anime aesthetic artwork',
+    'clean gradient abstract art',
+    'exotic supercars aesthetic',
+    'lush green forest mist',
+    'sunset golden hour aesthetic',
+    'pastel dreamy artistic wallpaper',
+    'synthwave retro 80s neon',
+    'minimalist monochrome black',
+    'epic mountain peaks foggy',
+    'futuristic sci fi concept art',
+  ];
+
+  int _lastThemeIndex = -1;
+  String? _currentDailyTheme;
+  final Set<String> _seenWallpaperIds = <String>{};
+  static const int _maxSeenHistory = 200;
+
   WallpaperCubit({
     required this.repository,
     required this.searchLocalDataSource,
@@ -39,10 +68,29 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       return;
     }
 
+    final isDailyPicks = (state.currentQuery == null || state.currentQuery!.isEmpty) &&
+        (state.selectedCategory == null ||
+            state.selectedCategory!.isEmpty ||
+            state.selectedCategory == 'All');
+
     int targetPage = isRefresh ? 1 : state.page;
-    if (randomize) {
-      targetPage = 1 + math.Random().nextInt(10);
+    if (randomize || (isRefresh && isDailyPicks)) {
+      // Pick a random page offset for fresh variety
+      targetPage = 1 + math.Random().nextInt(15);
     }
+
+    if (isRefresh && isDailyPicks) {
+      // Pick a distinct daily pick theme different from the previous one
+      int themeIdx = math.Random().nextInt(_dailyPickThemes.length);
+      if (_dailyPickThemes.length > 1 && themeIdx == _lastThemeIndex) {
+        themeIdx = (themeIdx + 1) % _dailyPickThemes.length;
+      }
+      _lastThemeIndex = themeIdx;
+      _currentDailyTheme = _dailyPickThemes[themeIdx];
+    } else if (isRefresh && !isDailyPicks) {
+      _currentDailyTheme = null;
+    }
+
     final currentList = isRefresh ? <WallpaperEntity>[] : state.wallpapers;
 
     emit(state.copyWith(
@@ -63,6 +111,12 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       final sortBy = state.selectedSort;
       final source = state.selectedSource;
 
+      // Smart order variation when randomizing to prevent stale cached order
+      final sortOptions = ['popular', 'latest', 'relevant'];
+      final effectiveSortBy = (randomize && isDailyPicks)
+          ? sortOptions[math.Random().nextInt(sortOptions.length)]
+          : sortBy;
+
       if (query != null && query.isNotEmpty) {
         newWallpapers = await repository.searchWallpapers(
           query: query,
@@ -72,7 +126,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
           color: color,
           source: source,
         );
-      } else if (category != null && category.isNotEmpty) {
+      } else if (category != null && category.isNotEmpty && category != 'All') {
         final categoryQuery = AppCategories.getSearchQueryForCategory(category);
         newWallpapers = await repository.searchWallpapers(
           query: categoryQuery,
@@ -83,19 +137,22 @@ class WallpaperCubit extends Cubit<WallpaperState> {
           source: source,
         );
       } else {
-        if ((orientation.isNotEmpty) || (color != null && color.isNotEmpty)) {
-          newWallpapers = await repository.searchWallpapers(
-            query: 'wallpapers',
-            page: targetPage,
-            orderBy: sortBy,
-            orientation: orientation,
-            color: color,
-            source: source,
-          );
-        } else {
+        // Daily Picks: Use rotated dynamic curated theme for rich diversity
+        final activeDailyQuery = _currentDailyTheme ?? _dailyPickThemes[0];
+        newWallpapers = await repository.searchWallpapers(
+          query: activeDailyQuery,
+          page: targetPage,
+          orderBy: effectiveSortBy,
+          orientation: orientation,
+          color: color,
+          source: source,
+        );
+
+        // Fallback: If empty, try curated editorial photos
+        if (newWallpapers.isEmpty) {
           newWallpapers = await repository.getCuratedWallpapers(
             page: targetPage,
-            orderBy: sortBy,
+            orderBy: effectiveSortBy,
             source: source,
           );
         }
@@ -109,17 +166,56 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         return true;
       }).toList();
 
-      if (randomize && newWallpapers.isNotEmpty) {
-        newWallpapers.shuffle(math.Random());
+      // Deduplicate within the fetched list itself
+      final uniqueNew = <String, WallpaperEntity>{};
+      for (final w in newWallpapers) {
+        if (w.id.isNotEmpty && !uniqueNew.containsKey(w.id)) {
+          uniqueNew[w.id] = w;
+        }
+      }
+      List<WallpaperEntity> dedupedList = uniqueNew.values.toList();
+
+      if (isRefresh) {
+        // Anti-repetition: Prioritize wallpapers the user hasn't seen recently
+        final unseenWallpapers = <WallpaperEntity>[];
+        final previouslySeen = <WallpaperEntity>[];
+
+        for (final item in dedupedList) {
+          if (_seenWallpaperIds.contains(item.id)) {
+            previouslySeen.add(item);
+          } else {
+            unseenWallpapers.add(item);
+          }
+        }
+
+        // Shuffle unseen wallpapers for maximum visual variety on refresh
+        unseenWallpapers.shuffle(math.Random());
+
+        dedupedList = [...unseenWallpapers, ...previouslySeen];
+
+        // Track in session history buffer
+        for (final item in dedupedList) {
+          _seenWallpaperIds.add(item.id);
+        }
+        while (_seenWallpaperIds.length > _maxSeenHistory) {
+          _seenWallpaperIds.remove(_seenWallpaperIds.first);
+        }
+      } else {
+        // Pagination: filter out any that already exist in currentList
+        final existingIds = currentList.map((w) => w.id).toSet();
+        dedupedList = dedupedList.where((w) => !existingIds.contains(w.id)).toList();
+        for (final item in dedupedList) {
+          _seenWallpaperIds.add(item.id);
+        }
       }
 
-      final updatedList = List<WallpaperEntity>.from(currentList)..addAll(newWallpapers);
+      final updatedList = List<WallpaperEntity>.from(currentList)..addAll(dedupedList);
 
       emit(state.copyWith(
         status: WallpaperStatus.loaded,
         wallpapers: updatedList,
         page: targetPage + 1,
-        hasReachedMax: newWallpapers.isEmpty,
+        hasReachedMax: dedupedList.isEmpty,
         errorMessage: null,
       ));
     } catch (e) {
@@ -172,7 +268,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     } else {
       emit(state.copyWith(selectedCategory: category, clearQuery: true));
     }
-    await fetchWallpapers(isRefresh: true);
+    await fetchWallpapers(isRefresh: true, randomize: true);
   }
 
   Future<void> applyFilters({
@@ -189,7 +285,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       selectedSort: sortBy ?? state.selectedSort,
       selectedSource: source ?? state.selectedSource,
     ));
-    await fetchWallpapers(isRefresh: true);
+    await fetchWallpapers(isRefresh: true, randomize: true);
   }
 
   Future<void> clearFilters() async {
@@ -199,7 +295,7 @@ class WallpaperCubit extends Cubit<WallpaperState> {
       selectedSort: 'popular',
       selectedSource: 'all',
     ));
-    await fetchWallpapers(isRefresh: true);
+    await fetchWallpapers(isRefresh: true, randomize: true);
   }
 
   Future<void> downloadWallpaper(WallpaperEntity wallpaper) async {

@@ -30,7 +30,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<WallpaperCubit>();
       if (cubit.state.wallpapers.isEmpty) {
-        cubit.fetchWallpapers(isRefresh: true);
+        cubit.fetchWallpapers(isRefresh: true, randomize: true);
       }
     });
   }
