@@ -60,45 +60,52 @@ class CustomBottomNavigationBar extends StatelessWidget {
               child: BackdropFilter(
                 filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     // 1. HOME
-                    _NavBarNavItem(
-                      label: 'HOME',
-                      icon: Icons.grid_view_rounded,
-                      isActive: currentIndex == 0,
-                      isDark: isDark,
-                      onTap: () => onTabSelected(0),
+                    Expanded(
+                      child: _NavBarNavItem(
+                        label: 'HOME',
+                        icon: Icons.grid_view_rounded,
+                        isActive: currentIndex == 0,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(0),
+                      ),
                     ),
 
                     // 2. EXPLORE
-                    _NavBarNavItem(
-                      label: 'EXPLORE',
-                      icon: Icons.explore_rounded,
-                      isActive: currentIndex == 1,
-                      isDark: isDark,
-                      onTap: () => onTabSelected(1),
+                    Expanded(
+                      child: _NavBarNavItem(
+                        label: 'EXPLORE',
+                        icon: Icons.explore_rounded,
+                        isActive: currentIndex == 1,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(1),
+                      ),
                     ),
 
                     // Spacer for central elevated AI STUDIO button
-                    const SizedBox(width: 56),
+                    const SizedBox(width: 48),
 
                     // 4. MY ART
-                    _NavBarNavItem(
-                      label: 'MY ART',
-                      icon: Icons.collections_rounded,
-                      isActive: currentIndex == 3,
-                      isDark: isDark,
-                      onTap: () => onTabSelected(3),
+                    Expanded(
+                      child: _NavBarNavItem(
+                        label: 'MY ART',
+                        icon: Icons.collections_rounded,
+                        isActive: currentIndex == 3,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(3),
+                      ),
                     ),
 
                     // 5. PROFILE
-                    _NavBarNavItem(
-                      label: 'PROFILE',
-                      icon: Icons.person_rounded,
-                      isActive: currentIndex == 4,
-                      isDark: isDark,
-                      onTap: () => onTabSelected(4),
+                    Expanded(
+                      child: _NavBarNavItem(
+                        label: 'PROFILE',
+                        icon: Icons.person_rounded,
+                        isActive: currentIndex == 4,
+                        isDark: isDark,
+                        onTap: () => onTabSelected(4),
+                      ),
                     ),
                   ],
                 ),

@@ -330,17 +330,22 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                sectionTitle,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: isDark
-                                      ? AppColors.textPrimary
-                                      : AppColors.lightTextPrimary,
-                                  letterSpacing: -0.3,
+                              Expanded(
+                                child: Text(
+                                  sectionTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: isDark
+                                        ? AppColors.textPrimary
+                                        : AppColors.lightTextPrimary,
+                                    letterSpacing: -0.3,
+                                  ),
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 '${state.wallpapers.length} items',
                                 style: TextStyle(

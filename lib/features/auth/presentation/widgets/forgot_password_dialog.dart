@@ -89,21 +89,27 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Icon Header
+                    // Logo Header
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        width: 60,
+                        height: 60,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.4),
-                          ),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              blurRadius: 16,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
-                        child: const Icon(
-                          Icons.lock_reset_rounded,
-                          color: AppColors.primary,
-                          size: 32,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.asset(
+                            'assets/icons/app_icon.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

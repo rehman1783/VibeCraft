@@ -85,7 +85,9 @@ class AIFeatureCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Sub-badges at top-left
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
                           // Purple "NEW ERA" Badge
                           Container(
@@ -113,7 +115,6 @@ class AIFeatureCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
 
                           // Glassmorphic "AI GENERATOR" Badge
                           Container(

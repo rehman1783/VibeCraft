@@ -180,20 +180,25 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                sectionTitle,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w900,
-                                      color: isDark
-                                          ? AppColors.textPrimary
-                                          : AppColors.lightTextPrimary,
-                                      letterSpacing: -0.3,
-                                    ),
+                              Expanded(
+                                child: Text(
+                                  sectionTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: isDark
+                                            ? AppColors.textPrimary
+                                            : AppColors.lightTextPrimary,
+                                        letterSpacing: -0.3,
+                                      ),
+                                ),
                               ),
+                              const SizedBox(width: 8),
 
                               // Multi-page Indicator (Three small purple dots with an active one)
                               Row(

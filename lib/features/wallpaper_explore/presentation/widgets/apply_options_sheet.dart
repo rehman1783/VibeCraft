@@ -111,26 +111,28 @@ class _ApplyOptionsSheetState extends State<ApplyOptionsSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Set Wallpaper',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 20,
-                      color: textColor,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Set Wallpaper',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20,
+                        color: textColor,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Choose where you want to apply this wallpaper',
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 12,
+                    const SizedBox(height: 2),
+                    Text(
+                      'Choose where you want to apply this wallpaper',
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               IconButton(
                 icon: Icon(Icons.close_rounded, color: textColor),

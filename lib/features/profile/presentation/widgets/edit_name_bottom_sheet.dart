@@ -73,110 +73,113 @@ class _EditNameBottomSheetState extends State<EditNameBottomSheet> {
         ),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: textSecondary.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-              Text(
-                'Update Display Name',
-                style: TextStyle(
-                  color: textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Enter your new full name below to update your profile.',
-                style: TextStyle(color: textSecondary, fontSize: 13),
-              ),
-
-              const SizedBox(height: 20),
-
-              TextFormField(
-                controller: _nameController,
-                style: TextStyle(color: textPrimary),
-                autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  labelStyle: TextStyle(color: textSecondary),
-                  hintText: 'e.g. John Doe',
-                  hintStyle: TextStyle(
-                    color: textSecondary.withValues(alpha: 0.6),
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? AppColors.background.withValues(alpha: 0.5)
-                      : AppColors.lightInputFill,
-                  prefixIcon: const Icon(
-                    Icons.person_outline_rounded,
-                    color: AppColors.primary,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? AppColors.primary.withValues(alpha: 0.1)
-                          : AppColors.lightBorder,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Drag Handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: textSecondary.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
+                ),
+
+                Text(
+                  'Update Display Name',
+                  style: TextStyle(
+                    color: textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Enter your new full name below to update your profile.',
+                  style: TextStyle(color: textSecondary, fontSize: 13),
+                ),
+
+                const SizedBox(height: 20),
+
+                TextFormField(
+                  controller: _nameController,
+                  style: TextStyle(color: textPrimary),
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: 'Full Name',
+                    labelStyle: TextStyle(color: textSecondary),
+                    hintText: 'e.g. John Doe',
+                    hintStyle: TextStyle(
+                      color: textSecondary.withValues(alpha: 0.6),
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? AppColors.background.withValues(alpha: 0.5)
+                        : AppColors.lightInputFill,
+                    prefixIcon: const Icon(
+                      Icons.person_outline_rounded,
                       color: AppColors.primary,
-                      width: 2,
                     ),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Display name cannot be empty';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
                     ),
-                    elevation: 0,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : AppColors.lightBorder,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
                   ),
-                  onPressed: _onSave,
-                  child: const Text(
-                    'Save Name',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Display name cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: _onSave,
+                    child: const Text(
+                      'Save Name',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
         ),
       ),

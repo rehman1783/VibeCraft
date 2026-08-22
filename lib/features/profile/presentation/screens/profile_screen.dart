@@ -59,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return MultiBlocListener(
       listeners: [
@@ -229,6 +230,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subtitle: 'Permanently remove account & data',
                       isDestructive: true,
                       onTap: () => _onDeleteAccount(context),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // App Branding & Version Info
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.25),
+                                  blurRadius: 16,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.asset(
+                                'assets/icons/app_icon.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'VibeCraft',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Version 1.0.0 • AI-Powered Wallpapers',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark
+                                  ? AppColors.textSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 40),

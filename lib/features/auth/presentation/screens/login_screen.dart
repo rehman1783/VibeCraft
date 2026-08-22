@@ -124,32 +124,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const SizedBox(height: 24),
 
-                        // Top Purple Dashed Question Icon Container
+                        // App Icon Logo
                         Container(
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF201335)
-                                : const Color(0xFFF0E8FF),
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: const Color(0xFF8B3CFF).withValues(alpha: 0.35),
-                              width: 1.5,
-                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF8B3CFF).withValues(alpha: 0.2),
-                                blurRadius: 20,
+                                color: const Color(0xFF8B3CFF).withValues(alpha: 0.3),
+                                blurRadius: 24,
                                 spreadRadius: 2,
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.help_outline_rounded,
-                              color: Color(0xFF9D54FF),
-                              size: 38,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.asset(
+                              'assets/icons/app_icon.png',
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),

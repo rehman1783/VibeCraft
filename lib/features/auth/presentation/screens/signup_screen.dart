@@ -143,36 +143,25 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         const SizedBox(height: 12),
 
-                        // Top Purple Dashed Question Icon Container
+                        // App Icon Logo
                         Container(
                           width: 72,
                           height: 72,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF201335)
-                                : const Color(0xFFF0E8FF),
                             borderRadius: BorderRadius.circular(22),
-                            border: Border.all(
-                              color: const Color(
-                                0xFF8B3CFF,
-                              ).withValues(alpha: 0.35),
-                              width: 1.5,
-                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFF8B3CFF,
-                                ).withValues(alpha: 0.2),
-                                blurRadius: 18,
-                                spreadRadius: 1.5,
+                                color: const Color(0xFF8B3CFF).withValues(alpha: 0.3),
+                                blurRadius: 20,
+                                spreadRadius: 2,
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.person_add_outlined,
-                              color: Color(0xFF9D54FF),
-                              size: 34,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: Image.asset(
+                              'assets/icons/app_icon.png',
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
