@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/vibe_text_field.dart';
+import '../../../wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
 import '../cubit/ai_chat_cubit.dart';
 import '../cubit/ai_chat_state.dart';
-import '../widgets/ai_generated_wallpaper_preview_dialog.dart';
 import '../widgets/generation_shimmer_card.dart';
 import '../widgets/interactive_chat_bubble.dart';
 
@@ -58,8 +58,6 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
 
     final cubit = context.read<AiChatCubit>();
 
-    final secondaryTextColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
     final footerBg = isDark ? const Color(0xFF141520) : AppColors.lightSurface;
     final footerBorder = isDark
         ? Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.08)))
@@ -80,7 +78,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Clear Chat',
+            tooltip: 'Clear History',
             icon: const Icon(Icons.refresh_rounded, size: 22),
             onPressed: () => cubit.clearChat(),
           ),
@@ -89,19 +87,18 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
       body: BlocConsumer<AiChatCubit, AiChatState>(
         listener: (context, state) {
           if (state.status == AiChatStatus.success &&
-              state.generatedImageUrl != null) {
-            final prompt = state.lastPrompt ?? 'AI Vertical Wallpaper';
-            final imageUrl = state.generatedImageUrl!;
-
+              state.generatedWallpaper != null) {
+            final wallpaper = state.generatedWallpaper!;
             cubit.resetGeneration();
 
-            AiGeneratedWallpaperPreviewDialog.show(
-              context: context,
-              imageUrl: imageUrl,
-              prompt: prompt,
-              onRegenerate: () => cubit.generateWallpaper(prompt),
+            // Directly navigate to full Wallpaper Detail screen with all actions (Set, Save, Preview, Favorite)
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => WallpaperDetailScreen(wallpaper: wallpaper),
+              ),
             );
-          } else if (state.status == AiChatStatus.typing ||
+          } else if (state.status == AiChatStatus.generatingImage ||
               state.status == AiChatStatus.responseReceived) {
             _scrollToBottom();
           }
@@ -166,7 +163,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                           cubit.selectStyle(selected ? style : '');
                           if (selected) {
                             cubit.sendPrompt(
-                              'Suggest a stunning $style wallpaper concept with dramatic lighting and color palette.',
+                              'A breathtaking $style vertical wallpaper with vibrant cinematic colors and 8k detail',
                               styleOverride: style,
                             );
                           }
@@ -177,45 +174,15 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                 ),
               ),
 
-              // Dynamic Messaging Screen Body Window / Loading State
+              // Dynamic Screen Body: Live Generator or Chat History
               Expanded(
                 child: isGenerating
                     ? GenerationShimmerCard(prompt: state.lastPrompt)
                     : ListView.builder(
                         controller: _scrollController,
                         padding: const EdgeInsets.all(16.0),
-                        itemCount: state.messages.length +
-                            (state.status == AiChatStatus.typing ? 1 : 0),
+                        itemCount: state.messages.length,
                         itemBuilder: (context, index) {
-                          if (index == state.messages.length) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  children: [
-                                    const SizedBox(
-                                      width: 14,
-                                      height: 14,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      'VibeCraft AI is refining with Gemini...',
-                                      style: TextStyle(
-                                        color: secondaryTextColor,
-                                        fontSize: 13,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
                           return InteractiveChatBubble(
                             message: state.messages[index],
                             onGenerateTap: (prompt) =>
@@ -223,7 +190,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                             onStyleTap: (style) {
                               cubit.selectStyle(style);
                               cubit.sendPrompt(
-                                'Let’s make this in $style style with vivid details.',
+                                'A stunning $style vertical mobile wallpaper with high-end detail',
                                 styleOverride: style,
                               );
                             },
@@ -235,7 +202,9 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
               // Footer Input Control Panel Bar
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
                 decoration: BoxDecoration(
                   color: footerBg,
                   border: footerBorder,
@@ -246,7 +215,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                       Expanded(
                         child: VibeTextField(
                           controller: _promptController,
-                          hintText: 'Describe your dream wallpaper...',
+                          hintText: 'Describe any wallpaper to create...',
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -255,7 +224,7 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
                         radius: 26,
                         child: IconButton(
                           icon: const Icon(
-                            Icons.send_rounded,
+                            Icons.auto_awesome_rounded,
                             color: Colors.white,
                           ),
                           onPressed: () {

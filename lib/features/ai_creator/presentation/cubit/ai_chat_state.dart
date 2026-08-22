@@ -1,3 +1,4 @@
+import '../../../wallpaper_explore/domain/entities/wallpaper_entity.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
 enum AiChatStatus {
@@ -13,6 +14,7 @@ class AiChatState {
   final AiChatStatus status;
   final List<ChatMessageEntity> messages;
   final String? generatedImageUrl;
+  final WallpaperEntity? generatedWallpaper;
   final String? lastPrompt;
   final String? selectedStyle;
   final String errorMessage;
@@ -21,6 +23,7 @@ class AiChatState {
     this.status = AiChatStatus.initial,
     this.messages = const [],
     this.generatedImageUrl,
+    this.generatedWallpaper,
     this.lastPrompt,
     this.selectedStyle,
     this.errorMessage = '',
@@ -30,6 +33,7 @@ class AiChatState {
     AiChatStatus? status,
     List<ChatMessageEntity>? messages,
     String? generatedImageUrl,
+    WallpaperEntity? generatedWallpaper,
     bool clearGeneratedImageUrl = false,
     String? lastPrompt,
     String? selectedStyle,
@@ -41,6 +45,9 @@ class AiChatState {
       generatedImageUrl: clearGeneratedImageUrl
           ? null
           : (generatedImageUrl ?? this.generatedImageUrl),
+      generatedWallpaper: clearGeneratedImageUrl
+          ? null
+          : (generatedWallpaper ?? this.generatedWallpaper),
       lastPrompt: lastPrompt ?? this.lastPrompt,
       selectedStyle: selectedStyle ?? this.selectedStyle,
       errorMessage: errorMessage ?? this.errorMessage,

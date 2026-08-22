@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../wallpaper_explore/domain/entities/wallpaper_entity.dart';
 import '../../domain/entities/chat_message_entity.dart';
 import '../../domain/repositories/ai_repository.dart';
 import 'ai_chat_state.dart';
@@ -12,8 +13,7 @@ class AiChatCubit extends Cubit<AiChatState> {
           messages: [
             ChatMessageEntity(
               text:
-                  "Hey! I am VibeCraft AI, your personal Wallpaper Architect. "
-                  "Describe your dream wallpaper, choose a style, and let's craft an 8K mobile masterpiece together!",
+                  "Hey! I am VibeCraft AI. Describe any wallpaper you want, and I will generate it instantly for you!",
               isUser: false,
               suggestedStyles: [
                 'Cyberpunk Neon',
@@ -22,14 +22,14 @@ class AiChatCubit extends Cubit<AiChatState> {
                 'Minimalist 3D',
                 'Neon Tokyo',
                 'Synthwave Sunset',
-                'Bioluminescent Forest',
+                'Bioluminescent Nature',
                 'Cosmic Nebula',
               ],
             ),
           ],
         ));
 
-  /// Send prompt to Gemini AI to refine wallpaper idea and conversation history
+  /// Directly generates the wallpaper without lengthy conversational replies
   Future<void> sendPrompt(String text, {String? styleOverride}) async {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) return;
@@ -46,47 +46,13 @@ class AiChatCubit extends Cubit<AiChatState> {
       ..add(userMessage);
 
     emit(state.copyWith(
-      status: AiChatStatus.typing,
+      status: AiChatStatus.generatingImage,
       messages: updatedMessages,
+      lastPrompt: trimmedText,
     ));
 
-    String aiResponseText = '';
-
-    try {
-      aiResponseText = await _aiRepository.sendChatMessage(
-        history: updatedMessages,
-        userMessage: trimmedText,
-      );
-    } catch (_) {
-      aiResponseText =
-          "I love this vision! Let's shape it with breathtaking lighting and fine details.";
-    }
-
-    // Synthesize full conversation history into a Master Visual Prompt (9:16 vertical)
-    final masterPrompt = _aiRepository.synthesizeMasterPrompt(
-      updatedMessages,
-      style: currentStyle,
-    );
-
-    final aiMessage = ChatMessageEntity(
-      text: aiResponseText,
-      isUser: false,
-      optimizedPrompt: masterPrompt,
-      timestamp: DateTime.now(),
-      suggestedStyles: [
-        'Cyberpunk Neon',
-        'Anime Studio',
-        'Dark OLED Fantasy',
-        'Minimalist 3D',
-        'Neon Tokyo',
-        'Synthwave Sunset',
-      ],
-    );
-
-    emit(state.copyWith(
-      status: AiChatStatus.responseReceived,
-      messages: List<ChatMessageEntity>.from(state.messages)..add(aiMessage),
-    ));
+    // Immediately trigger direct wallpaper generation
+    await generateWallpaper(trimmedText, style: currentStyle);
   }
 
   void selectStyle(String style) {
@@ -106,10 +72,34 @@ class AiChatCubit extends Cubit<AiChatState> {
         style: style ?? state.selectedStyle,
       );
 
+      final wallpaperEntity = WallpaperEntity(
+        id: 'ai_gen_${DateTime.now().millisecondsSinceEpoch}',
+        thumbnailUrl: generatedImagePathOrUrl,
+        highResUrl: generatedImagePathOrUrl,
+        rawUrl: generatedImagePathOrUrl,
+        photographer: 'VibeCraft AI',
+        photographerUsername: 'vibecraft_ai',
+        altDescription: prompt,
+        source: 'VibeCraft AI',
+        color: '#8B3CFF',
+        likes: 2857,
+        width: 1080,
+        height: 1920,
+      );
+
+      final aiMessage = ChatMessageEntity(
+        text: '✨ Here is your generated wallpaper for: "$prompt"',
+        isUser: false,
+        optimizedPrompt: prompt,
+        timestamp: DateTime.now(),
+      );
+
       emit(state.copyWith(
         status: AiChatStatus.success,
         generatedImageUrl: generatedImagePathOrUrl,
+        generatedWallpaper: wallpaperEntity,
         lastPrompt: prompt,
+        messages: List<ChatMessageEntity>.from(state.messages)..add(aiMessage),
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -131,8 +121,7 @@ class AiChatCubit extends Cubit<AiChatState> {
       messages: [
         ChatMessageEntity(
           text:
-              "Hey! I am VibeCraft AI, your personal Wallpaper Architect. "
-              "Describe your dream wallpaper, choose a style, and let's craft an 8K mobile masterpiece together!",
+              "Hey! I am VibeCraft AI. Describe any wallpaper you want, and I will generate it instantly for you!",
           isUser: false,
           suggestedStyles: [
             'Cyberpunk Neon',

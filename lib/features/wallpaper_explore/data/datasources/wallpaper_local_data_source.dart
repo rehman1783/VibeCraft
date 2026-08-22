@@ -43,12 +43,19 @@ class WallpaperLocalDataSourceImpl implements WallpaperLocalDataSource {
         ? wallpaper.highResUrl
         : wallpaper.thumbnailUrl;
 
-    final response = await dio.get(
-      downloadUrl,
-      options: Options(responseType: ResponseType.bytes),
-    );
-
-    await file.writeAsBytes(response.data as List<int>);
+    if (downloadUrl.startsWith('http://') ||
+        downloadUrl.startsWith('https://')) {
+      final response = await dio.get(
+        downloadUrl,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      await file.writeAsBytes(response.data as List<int>);
+    } else {
+      final sourceFile = File(downloadUrl);
+      if (await sourceFile.exists()) {
+        await sourceFile.copy(filePath);
+      }
+    }
 
     // Persist wallpaper entity metadata locally
     final existingList = await getDownloadedWallpapers();

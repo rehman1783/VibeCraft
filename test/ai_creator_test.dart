@@ -61,16 +61,14 @@ void main() {
       expect(cubit.state.messages.first.text, contains('VibeCraft AI'));
     });
 
-    test('sendPrompt sends message, updates history, and returns AI response', () async {
+    test('sendPrompt directly initiates wallpaper generation without conversational delay', () async {
       await cubit.sendPrompt('Cyberpunk city with neon rain');
 
-      expect(cubit.state.status, equals(AiChatStatus.responseReceived));
-      expect(cubit.state.messages.length, equals(3)); // Initial + User + AI
-      expect(cubit.state.messages[1].isUser, isTrue);
-      expect(cubit.state.messages[1].text, equals('Cyberpunk city with neon rain'));
-      expect(cubit.state.messages[2].isUser, isFalse);
-      expect(cubit.state.messages[2].optimizedPrompt, isNotNull);
-      expect(cubit.state.messages[2].optimizedPrompt, contains('Cyberpunk city'));
+      expect(cubit.state.status, equals(AiChatStatus.success));
+      expect(cubit.state.generatedImageUrl, equals('https://example.com/test_wallpaper.jpg'));
+      expect(cubit.state.generatedWallpaper, isNotNull);
+      expect(cubit.state.generatedWallpaper!.altDescription, equals('Cyberpunk city with neon rain'));
+      expect(cubit.state.generatedWallpaper!.source, equals('VibeCraft AI'));
     });
 
     test('selectStyle updates selectedStyle in state', () {
@@ -78,15 +76,18 @@ void main() {
       expect(cubit.state.selectedStyle, equals('Anime Studio'));
     });
 
-    test('generateWallpaper updates status to success with wallpaper URL', () async {
+    test('generateWallpaper updates status to success with wallpaper entity and URL', () async {
       await cubit.generateWallpaper('Aesthetic sunset over mountains');
 
       expect(cubit.state.status, equals(AiChatStatus.success));
       expect(cubit.state.generatedImageUrl, equals('https://example.com/test_wallpaper.jpg'));
+      expect(cubit.state.generatedWallpaper, isNotNull);
+      expect(cubit.state.generatedWallpaper!.highResUrl, equals('https://example.com/test_wallpaper.jpg'));
       expect(cubit.state.lastPrompt, equals('Aesthetic sunset over mountains'));
 
       cubit.resetGeneration();
       expect(cubit.state.generatedImageUrl, isNull);
+      expect(cubit.state.generatedWallpaper, isNull);
       expect(cubit.state.status, equals(AiChatStatus.responseReceived));
     });
 
