@@ -1,36 +1,47 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../domain/entities/chat_message_entity.dart';
+import '../../domain/repositories/ai_repository.dart';
 import 'ai_chat_state.dart';
 
 class AiChatCubit extends Cubit<AiChatState> {
-  final Dio _dio;
+  final AiRepository _aiRepository;
 
-  static const String _systemInstruction =
-      "You are VibeCraft AI, a creative, friendly, and intuitive AI Wallpaper Architect. "
-      "Chat with the user naturally—just like standard ChatGPT or Gemini. Listen carefully to their ideas, "
-      "ask refining questions about style, lighting, colors, and mood, and maintain full conversation memory. "
-      "Do not rush to generate images immediately unless the user's idea is complete. "
-      "Once the user confirms they like the concept, synthesize the entire conversation into an extremely detailed visual art prompt.";
-
-  AiChatCubit({Dio? dio})
-      : _dio = dio ?? Dio(),
+  AiChatCubit({required AiRepository aiRepository})
+      : _aiRepository = aiRepository,
         super(const AiChatState(
           messages: [
             ChatMessageEntity(
               text:
-                  "Hey! I am VibeCraft AI, your AI Wallpaper Architect. Tell me your wallpaper idea, and we'll refine the style, lighting, and mood together!",
+                  "Hey! I am VibeCraft AI, your personal Wallpaper Architect. "
+                  "Describe your dream wallpaper, choose a style, and let's craft an 8K mobile masterpiece together!",
               isUser: false,
+              suggestedStyles: [
+                'Cyberpunk Neon',
+                'Anime Studio',
+                'Dark OLED Fantasy',
+                'Minimalist 3D',
+                'Neon Tokyo',
+                'Synthwave Sunset',
+                'Bioluminescent Forest',
+                'Cosmic Nebula',
+              ],
             ),
           ],
         ));
 
-  Future<void> sendPrompt(String text) async {
+  /// Send prompt to Gemini AI to refine wallpaper idea and conversation history
+  Future<void> sendPrompt(String text, {String? styleOverride}) async {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) return;
 
-    final userMessage = ChatMessageEntity(text: trimmedText, isUser: true);
+    final currentStyle = styleOverride ?? state.selectedStyle;
+
+    final userMessage = ChatMessageEntity(
+      text: trimmedText,
+      isUser: true,
+      timestamp: DateTime.now(),
+    );
+
     final updatedMessages = List<ChatMessageEntity>.from(state.messages)
       ..add(userMessage);
 
@@ -39,72 +50,37 @@ class AiChatCubit extends Cubit<AiChatState> {
       messages: updatedMessages,
     ));
 
-    final apiKey = dotenv.env['GEMINI_API_KEY'] ??
-        'AQ.Ab8RN6InhZzuo4z4WQ9sjHrzMaHCcd99eiMhOpjWUPrxU76DyQ';
-
     String aiResponseText = '';
 
     try {
-      // Build full multi-turn conversation payload for Gemini
-      final contents = <Map<String, dynamic>>[];
-
-      // System persona instruction as initial context
-      contents.add({
-        "role": "user",
-        "parts": [{"text": _systemInstruction}]
-      });
-      contents.add({
-        "role": "model",
-        "parts": [
-          {
-            "text":
-                "Understood! I am VibeCraft AI. I will maintain full context memory, chat naturally, and help refine wallpaper ideas."
-          }
-        ]
-      });
-
-      // Pass ALL conversation messages in chronological order for full memory
-      for (final msg in updatedMessages) {
-        contents.add({
-          "role": msg.isUser ? "user" : "model",
-          "parts": [{"text": msg.text}]
-        });
-      }
-
-      final response = await _dio.post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey',
-        data: {"contents": contents},
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          validateStatus: (status) => status != null && status < 500,
-        ),
+      aiResponseText = await _aiRepository.sendChatMessage(
+        history: updatedMessages,
+        userMessage: trimmedText,
       );
-
-      if (response.statusCode == 200 && response.data != null) {
-        final data = response.data;
-        if (data['candidates'] != null &&
-            (data['candidates'] as List).isNotEmpty) {
-          final firstCandidate = data['candidates'][0];
-          final parts = firstCandidate['content']?['parts'] as List?;
-          if (parts != null && parts.isNotEmpty) {
-            aiResponseText = parts[0]['text'] ?? '';
-          }
-        }
-      }
-    } catch (_) {}
-
-    if (aiResponseText.trim().isEmpty) {
+    } catch (_) {
       aiResponseText =
-          "That's a great concept! What style or mood would you prefer for this wallpaper? (e.g. Cyberpunk, Minimalist 3D, Vibrant Anime, or Photorealistic)";
+          "I love this vision! Let's shape it with breathtaking lighting and fine details.";
     }
 
-    // Synthesize Master Visual Prompt combining entire conversation history
-    final masterPrompt = _synthesizeMasterPrompt(updatedMessages);
+    // Synthesize full conversation history into a Master Visual Prompt (9:16 vertical)
+    final masterPrompt = _aiRepository.synthesizeMasterPrompt(
+      updatedMessages,
+      style: currentStyle,
+    );
 
     final aiMessage = ChatMessageEntity(
       text: aiResponseText,
       isUser: false,
       optimizedPrompt: masterPrompt,
+      timestamp: DateTime.now(),
+      suggestedStyles: [
+        'Cyberpunk Neon',
+        'Anime Studio',
+        'Dark OLED Fantasy',
+        'Minimalist 3D',
+        'Neon Tokyo',
+        'Synthwave Sunset',
+      ],
     );
 
     emit(state.copyWith(
@@ -113,44 +89,61 @@ class AiChatCubit extends Cubit<AiChatState> {
     ));
   }
 
-  /// Synthesizes full conversation history into a Master Visual Art Prompt (9:16 vertical)
-  String _synthesizeMasterPrompt(List<ChatMessageEntity> history) {
-    final userPreferences = history
-        .where((m) => m.isUser)
-        .map((m) => m.text)
-        .join(', ');
-
-    return "A high-fidelity 9:16 vertical mobile wallpaper of $userPreferences, highly detailed, 8k resolution, cinematic lighting, photorealistic, stylized composition --ar 9:16";
+  void selectStyle(String style) {
+    emit(state.copyWith(selectedStyle: style));
   }
 
-  Future<void> generateWallpaper(String prompt) async {
+  /// Generate high-resolution vertical customized wallpaper using Gemini / AI engine
+  Future<void> generateWallpaper(String prompt, {String? style}) async {
     emit(state.copyWith(
       status: AiChatStatus.generatingImage,
       lastPrompt: prompt,
     ));
 
     try {
-      final encodedPrompt = Uri.encodeComponent(prompt);
-      final seed = DateTime.now().millisecondsSinceEpoch % 100000;
-      final generatedImageUrl =
-          'https://image.pollinations.ai/prompt/$encodedPrompt?width=720&height=1280&nologo=true&seed=$seed';
-
-      await Future.delayed(const Duration(seconds: 2));
+      final generatedImagePathOrUrl = await _aiRepository.generateWallpaper(
+        prompt: prompt,
+        style: style ?? state.selectedStyle,
+      );
 
       emit(state.copyWith(
         status: AiChatStatus.success,
-        generatedImageUrl: generatedImageUrl,
+        generatedImageUrl: generatedImagePathOrUrl,
         lastPrompt: prompt,
       ));
     } catch (e) {
-      emit(state.copyWith(status: AiChatStatus.failure));
+      emit(state.copyWith(
+        status: AiChatStatus.failure,
+        errorMessage: 'Failed to generate wallpaper. Please try again.',
+      ));
     }
   }
 
   void resetGeneration() {
     emit(state.copyWith(
       status: AiChatStatus.responseReceived,
-      generatedImageUrl: null,
+      clearGeneratedImageUrl: true,
+    ));
+  }
+
+  void clearChat() {
+    emit(const AiChatState(
+      messages: [
+        ChatMessageEntity(
+          text:
+              "Hey! I am VibeCraft AI, your personal Wallpaper Architect. "
+              "Describe your dream wallpaper, choose a style, and let's craft an 8K mobile masterpiece together!",
+          isUser: false,
+          suggestedStyles: [
+            'Cyberpunk Neon',
+            'Anime Studio',
+            'Dark OLED Fantasy',
+            'Minimalist 3D',
+            'Neon Tokyo',
+            'Synthwave Sunset',
+          ],
+        ),
+      ],
     ));
   }
 }

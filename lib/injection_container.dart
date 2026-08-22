@@ -5,6 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/app_config.dart';
 import 'core/network/network_info.dart';
 import 'core/services/wallpaper_service.dart';
+import 'features/ai_creator/data/datasources/gemini_chat_remote_source.dart';
+import 'features/ai_creator/data/datasources/gemini_image_remote_source.dart';
+import 'features/ai_creator/data/repositories/ai_repository_impl.dart';
+import 'features/ai_creator/domain/repositories/ai_repository.dart';
+import 'features/ai_creator/presentation/cubit/ai_chat_cubit.dart';
 import 'features/favorites/data/datasources/favorites_local_data_source.dart';
 import 'features/favorites/data/repositories/favorites_repository_impl.dart';
 import 'features/favorites/domain/repositories/favorites_repository.dart';
@@ -69,6 +74,14 @@ Future<void> initDependencyInjection() async {
     ),
   );
 
+  sl.registerLazySingleton<GeminiChatRemoteDataSource>(
+    () => GeminiChatRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
+  sl.registerLazySingleton<GeminiImageRemoteDataSource>(
+    () => GeminiImageRemoteDataSourceImpl(dio: sl<Dio>()),
+  );
+
   // 3. Repositories
   sl.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(localDataSource: sl<FavoritesLocalDataSource>()),
@@ -84,6 +97,13 @@ Future<void> initDependencyInjection() async {
     ),
   );
 
+  sl.registerLazySingleton<AiRepository>(
+    () => AiRepositoryImpl(
+      chatRemoteDataSource: sl<GeminiChatRemoteDataSource>(),
+      imageRemoteDataSource: sl<GeminiImageRemoteDataSource>(),
+    ),
+  );
+
   // 4. Cubit / Blocs
   sl.registerFactory<FavoritesCubit>(
     () => FavoritesCubit(repository: sl<FavoritesRepository>()),
@@ -94,5 +114,9 @@ Future<void> initDependencyInjection() async {
       repository: sl<WallpaperRepository>(),
       searchLocalDataSource: sl<SearchLocalDataSource>(),
     ),
+  );
+
+  sl.registerFactory<AiChatCubit>(
+    () => AiChatCubit(aiRepository: sl<AiRepository>()),
   );
 }

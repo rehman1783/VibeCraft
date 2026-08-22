@@ -5,11 +5,13 @@ import '../../domain/entities/chat_message_entity.dart';
 class InteractiveChatBubble extends StatelessWidget {
   final ChatMessageEntity message;
   final Function(String) onGenerateTap;
+  final Function(String)? onStyleTap;
 
   const InteractiveChatBubble({
     super.key,
     required this.message,
     required this.onGenerateTap,
+    this.onStyleTap,
   });
 
   @override
@@ -66,15 +68,83 @@ class InteractiveChatBubble extends StatelessWidget {
                       ),
                     ],
             ),
-            child: Text(
-              message.text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14.5,
-                height: 1.4,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!isUser) ...[
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome,
+                        color: AppColors.primary,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'VibeCraft AI',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11.5,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                Text(
+                  message.text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 14.5,
+                    height: 1.45,
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // Suggested Styles Quick Selection Chips
+          if (!isUser &&
+              message.suggestedStyles != null &&
+              message.suggestedStyles!.isNotEmpty &&
+              onStyleTap != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0, bottom: 6.0, left: 4.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: message.suggestedStyles!.map((style) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ActionChip(
+                        label: Text(
+                          style,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                        backgroundColor: isDark
+                            ? const Color(0xFF1E2030)
+                            : Colors.grey.shade200,
+                        side: BorderSide(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        onPressed: () => onStyleTap!(style),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
 
           // Prominent "✨ Create Wallpaper" Action Button for AI Messages
           if (!isUser && message.optimizedPrompt != null)

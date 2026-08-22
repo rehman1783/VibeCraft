@@ -60,7 +60,7 @@ class VibeCraftApp extends StatelessWidget {
             create: (_) => sl<FavoritesCubit>()..loadFavorites(),
           ),
           BlocProvider<NavigationCubit>(create: (_) => NavigationCubit()),
-          BlocProvider<AiChatCubit>(create: (_) => AiChatCubit()),
+          BlocProvider<AiChatCubit>(create: (_) => sl<AiChatCubit>()),
         ],
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, themeMode) {

@@ -1,12 +1,20 @@
 import '../../domain/entities/chat_message_entity.dart';
 
-enum AiChatStatus { initial, typing, responseReceived, generatingImage, success, failure }
+enum AiChatStatus {
+  initial,
+  typing,
+  responseReceived,
+  generatingImage,
+  success,
+  failure,
+}
 
 class AiChatState {
   final AiChatStatus status;
   final List<ChatMessageEntity> messages;
   final String? generatedImageUrl;
   final String? lastPrompt;
+  final String? selectedStyle;
   final String errorMessage;
 
   const AiChatState({
@@ -14,6 +22,7 @@ class AiChatState {
     this.messages = const [],
     this.generatedImageUrl,
     this.lastPrompt,
+    this.selectedStyle,
     this.errorMessage = '',
   });
 
@@ -21,14 +30,19 @@ class AiChatState {
     AiChatStatus? status,
     List<ChatMessageEntity>? messages,
     String? generatedImageUrl,
+    bool clearGeneratedImageUrl = false,
     String? lastPrompt,
+    String? selectedStyle,
     String? errorMessage,
   }) {
     return AiChatState(
       status: status ?? this.status,
       messages: messages ?? this.messages,
-      generatedImageUrl: generatedImageUrl ?? this.generatedImageUrl,
+      generatedImageUrl: clearGeneratedImageUrl
+          ? null
+          : (generatedImageUrl ?? this.generatedImageUrl),
       lastPrompt: lastPrompt ?? this.lastPrompt,
+      selectedStyle: selectedStyle ?? this.selectedStyle,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

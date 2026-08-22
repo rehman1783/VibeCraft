@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
 import 'package:vibe_craft/core/utils/app_snackbar.dart';
 import 'package:vibe_craft/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
+import 'package:vibe_craft/features/wallpaper_explore/domain/repositories/wallpaper_repository.dart';
 import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
+import 'package:vibe_craft/injection_container.dart';
 
 class AiGeneratedWallpaperPreviewDialog extends StatefulWidget {
   final String imageUrl;
@@ -44,6 +47,10 @@ class _AiGeneratedWallpaperPreviewDialogState
     extends State<AiGeneratedWallpaperPreviewDialog> {
   bool _isDownloading = false;
   bool _isSaved = false;
+  bool _isApplying = false;
+
+  bool get _isLocalFile =>
+      !widget.imageUrl.startsWith('http') && File(widget.imageUrl).existsSync();
 
   Future<void> _onDownloadPressed() async {
     if (_isDownloading || _isSaved) return;
@@ -91,6 +98,52 @@ class _AiGeneratedWallpaperPreviewDialogState
     }
   }
 
+  Future<void> _onSetWallpaperPressed() async {
+    if (_isApplying) return;
+
+    WallpaperRepository repository;
+    try {
+      repository = context.read<WallpaperRepository>();
+    } catch (_) {
+      repository = sl<WallpaperRepository>();
+    }
+
+    setState(() {
+      _isApplying = true;
+    });
+
+    try {
+      final success = await repository.applyWallpaper(
+        imagePathOrUrl: widget.imageUrl,
+        target: WallpaperTarget.both,
+      );
+
+      if (mounted) {
+        if (success) {
+          AppSnackBar.showSuccess(
+            context,
+            'Wallpaper successfully applied to Home & Lock Screens!',
+          );
+        } else {
+          AppSnackBar.showError(context, 'Failed to set wallpaper on device.');
+        }
+        setState(() {
+          _isApplying = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(
+          context,
+          'Failed to set wallpaper: ${e.toString()}',
+        );
+        setState(() {
+          _isApplying = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -102,43 +155,53 @@ class _AiGeneratedWallpaperPreviewDialogState
         fit: StackFit.expand,
         children: [
           // 1. High Resolution Vertical Wallpaper Image
-          CachedNetworkImage(
-            imageUrl: widget.imageUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              color: isDark ? const Color(0xFF141520) : Colors.grey.shade900,
-              child: const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(color: AppColors.primary),
-                    SizedBox(height: 16),
-                    Text(
-                      'Loading high-res preview...',
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
+          _isLocalFile
+              ? Image.file(
+                  File(widget.imageUrl),
+                  fit: BoxFit.cover,
+                )
+              : CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color:
+                        isDark ? const Color(0xFF141520) : Colors.grey.shade900,
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: AppColors.primary),
+                          SizedBox(height: 16),
+                          Text(
+                            'Loading 8K high-res preview...',
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 13),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.black,
-              child: const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.broken_image_rounded,
-                        color: Colors.redAccent, size: 48),
-                    SizedBox(height: 12),
-                    Text(
-                      'Failed to load generated image preview',
-                      style: TextStyle(color: Colors.white70),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.black,
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.redAccent,
+                            size: 48,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'Failed to load generated image preview',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
 
           // 2. Top Bar with Close Button & Title Badge
           Positioned(
@@ -204,7 +267,7 @@ class _AiGeneratedWallpaperPreviewDialogState
                         ),
                         SizedBox(width: 6),
                         Text(
-                          'AI Generated Art',
+                          'Gemini AI Masterpiece',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -230,8 +293,8 @@ class _AiGeneratedWallpaperPreviewDialogState
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.black.withValues(alpha: 0.92),
-                    Colors.black.withValues(alpha: 0.4),
+                    Colors.black.withValues(alpha: 0.94),
+                    Colors.black.withValues(alpha: 0.5),
                     Colors.transparent,
                   ],
                   begin: Alignment.bottomCenter,
@@ -260,9 +323,51 @@ class _AiGeneratedWallpaperPreviewDialogState
 
                   const SizedBox(height: 16),
 
-                  // Action Buttons Row: Download & Regenerate
+                  // Action Buttons Row: Apply, Download, Regenerate
                   Row(
                     children: [
+                      // Set Wallpaper Button
+                      Expanded(
+                        child: SizedBox(
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6366F1),
+                              foregroundColor: Colors.white,
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed:
+                                _isApplying ? null : _onSetWallpaperPressed,
+                            icon: _isApplying
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.wallpaper_rounded,
+                                    color: Colors.white,
+                                    size: 19,
+                                  ),
+                            label: Text(
+                              _isApplying ? 'Applying...' : 'Apply',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 8),
+
                       // Download Wallpaper Button
                       Expanded(
                         child: SizedBox(
@@ -278,7 +383,8 @@ class _AiGeneratedWallpaperPreviewDialogState
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            onPressed: _isDownloading ? null : _onDownloadPressed,
+                            onPressed:
+                                _isDownloading ? null : _onDownloadPressed,
                             icon: _isDownloading
                                 ? const SizedBox(
                                     width: 18,
@@ -293,14 +399,12 @@ class _AiGeneratedWallpaperPreviewDialogState
                                         ? Icons.check_circle_rounded
                                         : Icons.download_rounded,
                                     color: Colors.white,
-                                    size: 20,
+                                    size: 19,
                                   ),
                             label: Text(
-                              _isSaved
-                                  ? 'Saved to Downloads'
-                                  : 'Download Wallpaper',
+                              _isSaved ? 'Saved' : 'Save',
                               style: const TextStyle(
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -308,7 +412,7 @@ class _AiGeneratedWallpaperPreviewDialogState
                         ),
                       ),
 
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
 
                       // Regenerate Button
                       GestureDetector(
@@ -326,15 +430,12 @@ class _AiGeneratedWallpaperPreviewDialogState
                               color: Colors.white.withValues(alpha: 0.25),
                             ),
                           ),
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.refresh_rounded,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                            ],
+                          child: const Center(
+                            child: Icon(
+                              Icons.refresh_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
                           ),
                         ),
                       ),
