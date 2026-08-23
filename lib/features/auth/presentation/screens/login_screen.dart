@@ -402,92 +402,51 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Social Auth Buttons: Google & Apple
-                        Row(
-                          children: [
-                            // Google Button
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: isLoading ? null : () => _onSocialAuthPressed('Google'),
-                                child: Container(
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: cardBgColor,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: borderColor),
+                        // Social Auth Button: Google
+                        GestureDetector(
+                          onTap: isLoading ? null : () => _onSocialAuthPressed('Google'),
+                          child: Container(
+                            height: 52,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: cardBgColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Styled Google Icon Badge
+                                Container(
+                                  width: 22,
+                                  height: 22,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Styled Google Icon Badge
-                                      Container(
-                                        width: 22,
-                                        height: 22,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: const Center(
-                                          child: Text(
-                                            'G',
-                                            style: TextStyle(
-                                              color: Color(0xFF4285F4),
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
+                                  child: const Center(
+                                    child: Text(
+                                      'G',
+                                      style: TextStyle(
+                                        color: Color(0xFF4285F4),
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
                                       ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        'Google',
-                                        style: TextStyle(
-                                          color: titleColor,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-
-                            // Apple Button
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _onSocialAuthPressed('Apple'),
-                                child: Container(
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    color: cardBgColor,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: borderColor),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.apple,
-                                        color: titleColor,
-                                        size: 22,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Apple',
-                                        style: TextStyle(
-                                          color: titleColor,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Continue with Google',
+                                  style: TextStyle(
+                                    color: titleColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
 
                         const SizedBox(height: 36),
