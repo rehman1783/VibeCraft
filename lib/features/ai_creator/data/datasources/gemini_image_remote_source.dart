@@ -26,9 +26,10 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
     final imageModel = AppConfig.geminiImageModel;
     final baseUrl = AppConfig.geminiBaseUrl;
 
-    // 1. Attempt generation via Google Gemini / Imagen REST API
+    // 1. Attempt generation via Google Gemini / Imagen REST API if available
     try {
-      final imagenUrl = '$baseUrl/$apiVersion/models/$imageModel:predict?key=$apiKey';
+      final imagenUrl =
+          '$baseUrl/$apiVersion/models/$imageModel:predict?key=$apiKey';
       final response = await dio.post(
         imagenUrl,
         data: {
@@ -44,8 +45,8 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
         options: Options(
           headers: {'Content-Type': 'application/json'},
           validateStatus: (status) => true,
-          sendTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(seconds: 25),
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 15),
         ),
       );
 
@@ -58,11 +59,11 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
             final base64String = firstPred['bytesBase64Encoded'] as String? ??
                 firstPred['image'] as String?;
             if (base64String != null && base64String.isNotEmpty) {
-              // Save decoded bytes to temporary local image file for fastest rendering & sharing
               final imageBytes = base64Decode(base64String);
               final tempDir = await getTemporaryDirectory();
               final timestamp = DateTime.now().millisecondsSinceEpoch;
-              final localFile = File('${tempDir.path}/gemini_wall_$timestamp.jpg');
+              final localFile =
+                  File('${tempDir.path}/gemini_wall_$timestamp.jpg');
               await localFile.writeAsBytes(imageBytes);
               return localFile.path;
             }
@@ -73,14 +74,58 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
       // Cascade to high-definition AI rendering engine on quota or network constraints
     }
 
-    // 2. High-Fidelity 9:16 Vertical Engine (Resilient fallback)
-    final cleanedPrompt = Uri.encodeComponent(
-      '$prompt, 8k vertical mobile wallpaper, highly detailed, masterwork, 9:16 portrait',
-    );
-    final seed = DateTime.now().millisecondsSinceEpoch % 999999;
-    final fallbackUrl =
-        'https://image.pollinations.ai/prompt/$cleanedPrompt?width=1080&height=1920&nologo=true&seed=$seed&model=flux';
+    // 2. High-Performance Multi-Engine 9:16 Vertical AI Generator
+    final normalizedStyle = style?.toLowerCase() ?? '';
+    String primaryModel = 'flux';
+    if (normalizedStyle.contains('anime')) {
+      primaryModel = 'flux-anime';
+    } else if (normalizedStyle.contains('3d')) {
+      primaryModel = 'flux-3d';
+    } else if (normalizedStyle.contains('dark') ||
+        normalizedStyle.contains('oled') ||
+        normalizedStyle.contains('fantasy')) {
+      primaryModel = 'flux-realism';
+    }
 
-    return fallbackUrl;
+    final seed = DateTime.now().millisecondsSinceEpoch % 999999;
+    final encodedPrompt = Uri.encodeComponent(prompt);
+
+    // Candidates prioritized by fidelity and speed
+    final candidateEndpoints = [
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&seed=$seed&model=$primaryModel',
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&seed=${seed + 7}&model=flux',
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=720&height=1280&nologo=true&seed=${seed + 13}&model=turbo',
+    ];
+
+    final tempDir = await getTemporaryDirectory();
+
+    for (final candidateUrl in candidateEndpoints) {
+      try {
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final localFile = File('${tempDir.path}/vibecraft_ai_$timestamp.jpg');
+
+        final response = await dio.get<List<int>>(
+          candidateUrl,
+          options: Options(
+            responseType: ResponseType.bytes,
+            sendTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 25),
+            validateStatus: (status) => status == 200,
+          ),
+        );
+
+        if (response.data != null && response.data!.length > 1024) {
+          await localFile.writeAsBytes(response.data!);
+          return localFile.path;
+        }
+      } catch (_) {
+        // Try next engine candidate
+        continue;
+      }
+    }
+
+    // Fallback: If pre-download encountered network limits, return the direct URL
+    return candidateEndpoints.first;
   }
 }
+

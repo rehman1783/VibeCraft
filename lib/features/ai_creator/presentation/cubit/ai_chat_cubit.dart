@@ -13,7 +13,7 @@ class AiChatCubit extends Cubit<AiChatState> {
           messages: [
             ChatMessageEntity(
               text:
-                  "Hey! I am VibeCraft AI. Describe any wallpaper you want, and I will generate it instantly for you!",
+                  "Hey! I am VibeCraft AI. Describe any wallpaper you want (in English or Urdu), and I will generate a breathtaking 9:16 vertical masterpiece for you!",
               isUser: false,
               suggestedStyles: [
                 'Cyberpunk Neon',
@@ -29,7 +29,7 @@ class AiChatCubit extends Cubit<AiChatState> {
           ],
         ));
 
-  /// Directly generates the wallpaper without lengthy conversational replies
+  /// Directly processes the user command, optimizes it, and generates the wallpaper
   Future<void> sendPrompt(String text, {String? styleOverride}) async {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) return;
@@ -49,9 +49,10 @@ class AiChatCubit extends Cubit<AiChatState> {
       status: AiChatStatus.generatingImage,
       messages: updatedMessages,
       lastPrompt: trimmedText,
+      selectedStyle: currentStyle,
     ));
 
-    // Immediately trigger direct wallpaper generation
+    // Immediately trigger master prompt synthesis and wallpaper generation
     await generateWallpaper(trimmedText, style: currentStyle);
   }
 
@@ -61,15 +62,25 @@ class AiChatCubit extends Cubit<AiChatState> {
 
   /// Generate high-resolution vertical customized wallpaper using Gemini / AI engine
   Future<void> generateWallpaper(String prompt, {String? style}) async {
+    final activeStyle = style ?? state.selectedStyle;
+
     emit(state.copyWith(
       status: AiChatStatus.generatingImage,
       lastPrompt: prompt,
+      selectedStyle: activeStyle,
     ));
 
     try {
-      final generatedImagePathOrUrl = await _aiRepository.generateWallpaper(
+      // 1. Optimize and translate the prompt with Gemini into a 9:16 masterwork specification
+      final masterVisualPrompt = await _aiRepository.optimizePrompt(
         prompt: prompt,
-        style: style ?? state.selectedStyle,
+        style: activeStyle,
+      );
+
+      // 2. Generate and locally cache the 8k high-fidelity image
+      final generatedImagePathOrUrl = await _aiRepository.generateWallpaper(
+        prompt: masterVisualPrompt,
+        style: activeStyle,
       );
 
       final wallpaperEntity = WallpaperEntity(
@@ -77,20 +88,22 @@ class AiChatCubit extends Cubit<AiChatState> {
         thumbnailUrl: generatedImagePathOrUrl,
         highResUrl: generatedImagePathOrUrl,
         rawUrl: generatedImagePathOrUrl,
-        photographer: 'VibeCraft AI',
+        photographer: 'VibeCraft AI Studio',
         photographerUsername: 'vibecraft_ai',
         altDescription: prompt,
         source: 'VibeCraft AI',
         color: '#8B3CFF',
-        likes: 2857,
+        likes: 1248,
         width: 1080,
         height: 1920,
       );
 
       final aiMessage = ChatMessageEntity(
-        text: '✨ Here is your generated wallpaper for: "$prompt"',
+        text: '✨ Generated wallpaper for: "$prompt"',
         isUser: false,
-        optimizedPrompt: prompt,
+        optimizedPrompt: masterVisualPrompt,
+        imagePathOrUrl: generatedImagePathOrUrl,
+        wallpaper: wallpaperEntity,
         timestamp: DateTime.now(),
       );
 
@@ -121,7 +134,7 @@ class AiChatCubit extends Cubit<AiChatState> {
       messages: [
         ChatMessageEntity(
           text:
-              "Hey! I am VibeCraft AI. Describe any wallpaper you want, and I will generate it instantly for you!",
+              "Hey! I am VibeCraft AI. Describe any wallpaper you want (in English or Urdu), and I will generate a breathtaking 9:16 vertical masterpiece for you!",
           isUser: false,
           suggestedStyles: [
             'Cyberpunk Neon',
@@ -130,6 +143,8 @@ class AiChatCubit extends Cubit<AiChatState> {
             'Minimalist 3D',
             'Neon Tokyo',
             'Synthwave Sunset',
+            'Bioluminescent Nature',
+            'Cosmic Nebula',
           ],
         ),
       ],

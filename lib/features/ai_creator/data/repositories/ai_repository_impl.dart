@@ -24,6 +24,17 @@ class AiRepositoryImpl implements AiRepository {
   }
 
   @override
+  Future<String> optimizePrompt({
+    required String prompt,
+    String? style,
+  }) async {
+    return await chatRemoteDataSource.optimizePrompt(
+      prompt: prompt,
+      style: style,
+    );
+  }
+
+  @override
   Future<String> generateWallpaper({
     required String prompt,
     String? style,

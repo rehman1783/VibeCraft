@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
 class InteractiveChatBubble extends StatelessWidget {
@@ -29,6 +32,12 @@ class InteractiveChatBubble extends StatelessWidget {
     final textColor = isUser
         ? Colors.white
         : (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary);
+
+    final hasImage = message.imagePathOrUrl != null &&
+        message.imagePathOrUrl!.isNotEmpty;
+    final isLocalImage = hasImage &&
+        !message.imagePathOrUrl!.startsWith('http') &&
+        File(message.imagePathOrUrl!).existsSync();
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -106,6 +115,118 @@ class InteractiveChatBubble extends StatelessWidget {
             ),
           ),
 
+          // Generated Wallpaper Card Preview in chat
+          if (!isUser && hasImage)
+            GestureDetector(
+              onTap: () {
+                if (message.wallpaper != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          WallpaperDetailScreen(wallpaper: message.wallpaper!),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.only(top: 4.0, bottom: 12.0, left: 4.0),
+                width: 200,
+                height: 320,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      isLocalImage
+                          ? Image.file(
+                              File(message.imagePathOrUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: message.imagePathOrUrl!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: isDark
+                                    ? const Color(0xFF141520)
+                                    : Colors.grey.shade300,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey.shade900,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ),
+                            ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withValues(alpha: 0.8),
+                                Colors.transparent,
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.touch_app_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Tap to View & Apply',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
           // Suggested Styles Quick Selection Chips
           if (!isUser &&
               message.suggestedStyles != null &&
@@ -146,8 +267,8 @@ class InteractiveChatBubble extends StatelessWidget {
               ),
             ),
 
-          // Prominent "✨ Create Wallpaper" Action Button for AI Messages
-          if (!isUser && message.optimizedPrompt != null)
+          // Prominent "✨ Re-Create Wallpaper" Action Button for AI Messages without direct image
+          if (!isUser && message.optimizedPrompt != null && !hasImage)
             Padding(
               padding: const EdgeInsets.only(bottom: 14.0, top: 4.0, left: 4.0),
               child: Container(
@@ -199,3 +320,4 @@ class InteractiveChatBubble extends StatelessWidget {
     );
   }
 }
+
