@@ -4,148 +4,407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for VibeCraft - AI Wallpaper Creator & Wallpaper Exploration App. Learn how we handle and protect your data.">
     <title>Privacy Policy - VibeCraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #0b0d14;
+            --card-bg: rgba(20, 24, 36, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-purple: #8b3cff;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #38bdf8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+        }
+
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.65;
+            background: radial-gradient(circle at 50% 0%, #1e1338 0%, #0b0d14 60%, #07080c 100%);
+            color: var(--text-primary);
             min-height: 100vh;
+            padding: 40px 20px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: flex-start;
         }
 
         .container {
-            max-width: 750px;
+            max-width: 820px;
             width: 100%;
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 44px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(139, 60, 255, 0.08);
+        }
+
+        /* Badges & Headers */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .brand-badge {
-            display: inline-block;
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(139, 60, 255, 0.15);
+            color: var(--accent-purple-light);
             padding: 6px 14px;
             border-radius: 50px;
             font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(139, 60, 255, 0.35);
+        }
+
+        .brand-badge svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .compliance-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
             color: #ffffff;
-            font-size: 28px;
-            margin: 0 0 10px 0;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         p.subtitle {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 30px;
+            color: var(--text-secondary);
+            font-size: 14.5px;
+            margin-bottom: 32px;
+        }
+
+        /* Summary Hero Box */
+        .hero-box {
+            background: linear-gradient(135deg, rgba(139, 60, 255, 0.12) 0%, rgba(56, 189, 248, 0.08) 100%);
+            border: 1px solid rgba(139, 60, 255, 0.25);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            margin-bottom: 32px;
+        }
+
+        .hero-box p {
+            color: #e2e8f0;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .hero-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 32px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .section:last-of-type {
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
         h2 {
-            color: #38bdf8;
-            font-size: 18px;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 19px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.3px;
         }
 
-        p,
-        ul {
-            color: #cbd5e1;
-            font-size: 15px;
-            margin-top: 0;
+        h2 .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(139, 60, 255, 0.2);
+            color: var(--accent-purple-light);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 14.5px;
+            line-height: 1.7;
+            margin-bottom: 14px;
         }
 
         ul {
-            padding-left: 20px;
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 16px;
         }
 
         li {
+            position: relative;
+            padding-left: 24px;
             margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 14.5px;
+            line-height: 1.6;
         }
 
-        .highlight-box {
-            background: rgba(15, 23, 42, 0.6);
-            border-left: 4px solid #38bdf8;
+        li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: var(--accent-cyan);
+            font-weight: bold;
+            font-size: 18px;
+            line-height: 1;
+            top: 2px;
+        }
+
+        strong {
+            color: #f1f5f9;
+        }
+
+        /* Highlight & Info Cards */
+        .info-card {
+            background: rgba(11, 13, 20, 0.6);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            padding: 18px 20px;
+            margin: 16px 0;
+        }
+
+        .info-card.privacy-safe {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .info-card.privacy-warning {
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .info-card.privacy-danger {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .info-card h4 {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            margin-bottom: 0;
+        }
+
+        /* Third Party Grid */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin: 18px 0;
+        }
+
+        .provider-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
             padding: 16px;
-            border-radius: 6px;
-            margin: 20px 0;
-        }
-
-        .highlight-box p {
-            margin: 0;
-            font-size: 14px;
-            color: #e2e8f0;
-        }
-
-        a {
-            color: #38bdf8;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .email-btn {
-            display: inline-block;
-            background: #38bdf8;
-            color: #0f172a !important;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none !important;
-            font-size: 14px;
             transition: all 0.2s ease;
         }
 
-        .email-btn:hover {
-            background: #7dd3fc;
+        .provider-card:hover {
+            border-color: rgba(139, 60, 255, 0.4);
+            transform: translateY(-2px);
         }
 
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.1);
+        .provider-tag {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .provider-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .provider-desc {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Buttons & Actions */
+        .actions-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #8b3cff 0%, #6366f1 100%);
+            color: #ffffff !important;
+            padding: 12px 22px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            text-decoration: none !important;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(139, 60, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
             color: #f1f5f9;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 18px;
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
+            text-decoration: none;
             transition: all 0.2s ease;
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .btn-danger-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171 !important;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger-outline:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: #7dd3fc;
+            text-decoration: underline;
         }
 
         footer {
             margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--card-border);
             text-align: center;
-            font-size: 12px;
-            color: #64748b;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .container {
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .provider-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -153,72 +412,163 @@
 <body>
 
     <div class="container">
-        <span class="brand-badge">VibeCraft Legal</span>
+        <!-- Header Top Bar -->
+        <div class="top-bar">
+            <div class="brand-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                VibeCraft Legal & Compliance
+            </div>
+            <div class="compliance-pill">
+                ✓ Google Play & Policy Compliant
+            </div>
+        </div>
+
         <h1>Privacy Policy</h1>
-        <p class="subtitle">Effective Date: July 29, 2026</p>
+        <p class="subtitle">Effective Date: July 2026 | Last Updated: August 2026</p>
 
-        <p>Welcome to <strong>VibeCraft</strong>. Your privacy is paramount to us. This Privacy Policy outlines how we
-            handle your information, what data we collect, and how we protect your personal rights while using our
-            application.</p>
-
-        <h2>1. Account Registration & Data Collection</h2>
-        <p>VibeCraft utilizes <strong>Firebase Authentication</strong> for account creation and login services. We do
-            not
-            use third-party authentication services such as Google Sign-In.</p>
-        <ul>
-            <li><strong>Sign-Up Data:</strong> When creating an account, we collect your <strong>Name, Email Address,
-                    and Password</strong> to secure your account.</li>
-            <li><strong>Profile Picture (Optional):</strong> Users have the option to upload a custom profile picture
-                inside their profile settings. This step is purely voluntary and non-mandatory.</li>
-        </ul>
-
-        <h2>2. Wallpaper Storage & Device Permissions</h2>
-        <div class="highlight-box">
-            <p><strong>Zero Gallery Access Needed:</strong> VibeCraft values your device's security. We do
-                <strong>NOT</strong> request or require access to your physical Device Gallery or Photos storage.
-            </p>
-        </div>
-        <ul>
-            <li><strong>App Local Storage:</strong> Any wallpapers you save or download within VibeCraft are stored
-                strictly in the application’s private local storage directory.</li>
-            <li><strong>Direct Wallpaper Application:</strong> VibeCraft allows users to apply wallpapers directly to
-                their <strong>Home Screen, Lock Screen, or Both</strong> natively within the app without needing
-                external file access.</li>
-        </ul>
-
-        <h2>3. Third-Party Infrastructure</h2>
-        <p>Our app relies on <strong>Google Firebase</strong> backend infrastructure to securely manage account
-            credentials and databases. Firebase adheres to strict data encryption and security standards. You can read
-            more in the <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Privacy
-                Documentation</a>.</p>
-
-        <h2>4. Data Retention & Account Deletion</h2>
-        <p>We respect your right to control your personal information. When you choose to delete your account via the
-            in-app settings:</p>
-        <ul>
-            <li>Your account record (Name, Email, Password, Profile Picture) is permanently deleted from our Firebase
-                database.</li>
-            <li>All locally cached wallpapers, preferences, and app state are immediately wiped from your device.</li>
-        </ul>
-        <p>For more details on how deletion works, visit our <a href="delete_account.html">Account Deletion Page</a>.
-        </p>
-
-        <h2>5. Contact & Support</h2>
-        <p>If you have any questions, concerns, or feedback regarding this Privacy Policy or VibeCraft's data practices,
-            feel free to reach out to our support team:</p>
-
-        <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abdulrehman78ali@gmail.com" target="_blank"
-                class="email-btn">
-                📧 Open Gmail
-            </a>
-            <button onclick="copyEmail()" class="copy-btn" id="copyBtn">
-                📋 Copy Support Email
-            </button>
+        <!-- Summary Box -->
+        <div class="hero-box">
+            <p><strong>VibeCraft</strong> ("we", "our", or "the App") is an AI-powered wallpaper discovery and creation mobile application. We are committed to maintaining the trust and confidence of our users.</p>
+            <p>This Privacy Policy explains what information we collect when you use VibeCraft, how we utilize that data, our strict zero-gallery-intrusion privacy model, and how you retain complete control over your personal data.</p>
         </div>
 
+        <!-- Section 1 -->
+        <div class="section">
+            <h2><span class="section-num">1</span> Account Registration & Personal Data</h2>
+            <p>To provide personalized features like synced profiles, saved preferences, and customized wallpaper collections, VibeCraft offers secure user authentication powered by <strong>Google Firebase Authentication</strong>.</p>
+            <ul>
+                <li><strong>Account Credentials:</strong> When you sign up using Email & Password, we store your chosen display name and email address. Passwords are securely hashed and managed by Firebase Auth — we never have access to plain-text passwords.</li>
+                <li><strong>Google Sign-In:</strong> If you sign in using Google Sign-In, we receive your basic public profile information (Name, Email Address, and Avatar URL) from Google OAuth to create and sync your VibeCraft profile.</li>
+                <li><strong>Custom Avatar:</strong> You have the option to set a custom profile picture. Avatars can be saved locally on your device or linked to your Google profile photo.</li>
+                <li><strong>Cloud Firestore Database:</strong> We store minimal user metadata (UID, display name, email, authentication provider, and creation timestamp) in Google Cloud Firestore to maintain your account state across sessions.</li>
+            </ul>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section">
+            <h2><span class="section-num">2</span> Device Permissions & Wallpaper Storage</h2>
+            <p>VibeCraft is built with privacy-first engineering. We only request permissions that are essential for core wallpaper functionality:</p>
+            
+            <div class="info-card privacy-safe">
+                <h4>🛡️ Zero Public Photo Library Intrusion</h4>
+                <p>VibeCraft does <strong>NOT</strong> request, scan, read, or export data to your phone's personal photo gallery. Your private photos, albums, and media libraries are completely inaccessible to our app.</p>
+            </div>
+
+            <ul>
+                <li><strong>Private Sandboxed Storage:</strong> All downloaded wallpapers and locally cached images are saved strictly within VibeCraft's private app document directory. No external media scanner can access this data, and it is automatically removed upon account deletion or cache clearing.</li>
+                <li><strong>SET_WALLPAPER Permission:</strong> VibeCraft utilizes the native Android <code>SET_WALLPAPER</code> permission to allow you to directly set any wallpaper to your <strong>Home Screen</strong>, <strong>Lock Screen</strong>, or <strong>Both Screens</strong> seamlessly without requiring file manager access.</li>
+                <li><strong>Internet & Network State:</strong> <code>INTERNET</code> and <code>ACCESS_NETWORK_STATE</code> are used to fetch high-definition wallpapers, communicate with the AI generator, and check online status.</li>
+            </ul>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section">
+            <h2><span class="section-num">3</span> AI Creator & External Services</h2>
+            <p>VibeCraft integrates with trusted third-party service providers to deliver AI image creation and high-definition wallpaper exploration:</p>
+
+            <div class="provider-grid">
+                <div class="provider-card">
+                    <div class="provider-tag">Infrastructure & Auth</div>
+                    <div class="provider-name">Google Firebase</div>
+                    <p class="provider-desc">Provides secure authentication, real-time database sync via Firestore, and crash diagnostics with end-to-end encryption.</p>
+                </div>
+
+                <div class="provider-card">
+                    <div class="provider-tag">AI Generation</div>
+                    <div class="provider-name">Google Gemini AI</div>
+                    <p class="provider-desc">Powers the AI Creator feature to generate creative wallpaper ideas, styles, and prompt expansions. Prompts sent are anonymous.</p>
+                </div>
+
+                <div class="provider-card">
+                    <div class="provider-tag">Curated Wallpapers</div>
+                    <div class="provider-name">Unsplash & Pixabay</div>
+                    <p class="provider-desc">Provides searchable catalogs of high-resolution, curated royalty-free wallpapers. No personal data is shared with image providers.</p>
+                </div>
+
+                <div class="provider-card">
+                    <div class="provider-tag">Identity Provider</div>
+                    <div class="provider-name">Google Sign-In</div>
+                    <p class="provider-desc">Enables seamless one-tap sign-in using official Google OAuth 2.0 protocols without exposing credentials.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section">
+            <h2><span class="section-num">4</span> Data Retention & Account Deletion</h2>
+            <p>We respect your right to data sovereignty and privacy. You have full control over your data at any time:</p>
+            <ul>
+                <li><strong>Instant In-App Deletion:</strong> You can permanently delete your account directly inside the app by going to <strong>Profile &rarr; Delete Account</strong>. This instantly wipes your Firebase Auth account, Firestore documents, cached images, and local preferences.</li>
+                <li><strong>Web Deletion Portal:</strong> In full compliance with Google Play Account Deletion requirements, users who have uninstalled the app or lost access can request complete account removal via our web deletion portal or by email.</li>
+            </ul>
+            
+            <div class="info-card privacy-warning">
+                <h4>🗑️ Want to delete your account and all associated data?</h4>
+                <p>Visit our dedicated deletion portal for step-by-step instructions or to initiate an instant removal request.</p>
+            </div>
+
+            <div class="actions-group">
+                <a href="delete_account.html" class="btn-danger-outline">
+                    ⚠️ Go to Account Deletion Page
+                </a>
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section">
+            <h2><span class="section-num">5</span> User Rights (GDPR & CCPA Compliance)</h2>
+            <p>Regardless of your geographic location, VibeCraft extends the following fundamental privacy rights to all users:</p>
+            <ul>
+                <li><strong>Right to Access:</strong> You can view all profile information stored in your account at any time within the Profile tab.</li>
+                <li><strong>Right to Rectification:</strong> You can update your display name or profile picture directly within the app settings.</li>
+                <li><strong>Right to Erasure (Right to be Forgotten):</strong> You can permanently wipe all your account records, generated prompts, and local caches via in-app deletion or email request.</li>
+                <li><strong>Right to Restrict Processing:</strong> You can sign out or clear app cache at any moment.</li>
+            </ul>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section">
+            <h2><span class="section-num">6</span> Children's Privacy (COPPA Compliance)</h2>
+            <p>VibeCraft is designed for general audiences and is not directed towards children under the age of 13 (or under 16 in certain European jurisdictions). We do not knowingly collect or solicit personal information from children. If we discover that a child has provided us with personal information, we will delete such data immediately from our servers.</p>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="section">
+            <h2><span class="section-num">7</span> Security of Your Data</h2>
+            <p>We apply industry-standard security protocols to protect your personal data:</p>
+            <ul>
+                <li>All network communications between the VibeCraft app and backend servers are strictly encrypted using <strong>HTTPS / TLS 1.3</strong>.</li>
+                <li>Database access is guarded by restrictive <strong>Firebase Security Rules</strong>, ensuring only authenticated account holders can access their own profile documents.</li>
+            </ul>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="section">
+            <h2><span class="section-num">8</span> Contact Us & Support</h2>
+            <p>If you have any questions, concerns, or requests regarding this Privacy Policy or VibeCraft's privacy practices, please contact our dedicated support team:</p>
+            
+            <p><strong>Developer / Support Email:</strong> <a href="mailto:abdulrehman78ali@gmail.com">abdulrehman78ali@gmail.com</a></p>
+
+            <div class="actions-group">
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abdulrehman78ali@gmail.com&su=VibeCraft%20Privacy%20Inquiry" target="_blank" class="btn-primary">
+                    ✉️ Email Support (Gmail)
+                </a>
+                <button onclick="copyEmail()" class="btn-secondary" id="copyBtn">
+                    📋 Copy Support Email
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
         <footer>
-            &copy; 2026 VibeCraft. All rights reserved.
+            <div class="footer-links">
+                <a href="privacy_policy.html">Privacy Policy</a>
+                <span>•</span>
+                <a href="delete_account.html">Delete Account & Data</a>
+                <span>•</span>
+                <a href="mailto:abdulrehman78ali@gmail.com">Contact Support</a>
+            </div>
+            <p>&copy; 2026 VibeCraft. All rights reserved.</p>
         </footer>
     </div>
 
@@ -228,15 +578,18 @@
             navigator.clipboard.writeText(email).then(() => {
                 const btn = document.getElementById('copyBtn');
                 btn.innerText = "✓ Copied to Clipboard!";
-                btn.style.background = "#22c55e";
+                btn.style.background = "rgba(16, 185, 129, 0.2)";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#10b981";
                 setTimeout(() => {
                     btn.innerText = "📋 Copy Support Email";
-                    btn.style.background = "rgba(255, 255, 255, 0.1)";
+                    btn.style.background = "rgba(255, 255, 255, 0.08)";
+                    btn.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                    btn.style.color = "#f1f5f9";
                 }, 3000);
             });
         }
     </script>
-
 </body>
 
 </html>
