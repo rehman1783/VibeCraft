@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "197785385774-1akanlh541e77udenshfj62qjm3mkm08.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vibecraft.app",
+            "certificate_hash": "417f4aff821bffac69f944773418840ce6ea37a2"
+          }
+        },
+        {
           "client_id": "197785385774-t4g40o0ik12larhb7nq1tfpnkubsghri.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

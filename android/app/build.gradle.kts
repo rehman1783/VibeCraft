@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import java.io.File
 
 plugins {
     id("com.android.application")
@@ -28,7 +29,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -53,7 +54,8 @@ android {
             ) {
                 keyAlias = keyAliasProp
                 keyPassword = keyPasswordProp
-                storeFile = file(storeFileProp)
+                val keyFile = File(storeFileProp)
+                storeFile = if (keyFile.isAbsolute) keyFile else rootProject.file(storeFileProp)
                 storePassword = storePasswordProp
             }
         }
