@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/network/network_info.dart';
 import '../../../../core/services/wallpaper_service.dart';
+import '../../../../core/utils/content_safety_filter.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 import '../../domain/repositories/wallpaper_repository.dart';
 import '../datasources/pixabay_remote_source.dart';
@@ -70,7 +71,8 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
             .getCuratedPhotos(page: page, orderBy: orderBy)
             .timeout(const Duration(seconds: 12));
         final list = models.map((m) => m.toEntity()).toList();
-        if (list.isNotEmpty) return list;
+        final safeList = SafeContentFilter.filterWallpapers(list);
+        if (safeList.isNotEmpty) return safeList;
       } catch (_) {
         // Fallback to Pixabay if Unsplash encounters rate-limits or errors
       }
@@ -78,7 +80,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
         final models = await pixabayRemoteDataSource
             .getCuratedPhotos(page: page, orderBy: orderBy)
             .timeout(const Duration(seconds: 12));
-        return models.map((m) => m.toEntity()).toList();
+        return SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
@@ -90,7 +92,8 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
             .getCuratedPhotos(page: page, orderBy: orderBy)
             .timeout(const Duration(seconds: 12));
         final list = models.map((m) => m.toEntity()).toList();
-        if (list.isNotEmpty) return list;
+        final safeList = SafeContentFilter.filterWallpapers(list);
+        if (safeList.isNotEmpty) return safeList;
       } catch (_) {
         // Fallback to Unsplash if Pixabay fails
       }
@@ -98,7 +101,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
         final models = await unsplashRemoteDataSource
             .getCuratedPhotos(page: page, orderBy: orderBy)
             .timeout(const Duration(seconds: 12));
-        return models.map((m) => m.toEntity()).toList();
+        return SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
@@ -115,7 +118,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
           final models = await unsplashRemoteDataSource
               .getCuratedPhotos(page: page, orderBy: orderBy)
               .timeout(const Duration(seconds: 12));
-          unsplashResults = models.map((m) => m.toEntity()).toList();
+          unsplashResults = SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
         } catch (e) {
           lastError = e;
         }
@@ -125,7 +128,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
           final models = await pixabayRemoteDataSource
               .getCuratedPhotos(page: page, orderBy: orderBy)
               .timeout(const Duration(seconds: 12));
-          pixabayResults = models.map((m) => m.toEntity()).toList();
+          pixabayResults = SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
         } catch (e) {
           lastError = e;
         }
@@ -152,13 +155,14 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
       throw const NoInternetFailure();
     }
 
+    final safeQuery = SafeContentFilter.sanitizeSearchQuery(query);
     final selectedSource = source?.toLowerCase() ?? 'all';
 
     if (selectedSource == 'unsplash') {
       try {
         final models = await unsplashRemoteDataSource
             .searchPhotos(
-              query: query,
+              query: safeQuery,
               page: page,
               orderBy: orderBy,
               orientation: orientation,
@@ -166,21 +170,22 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
             )
             .timeout(const Duration(seconds: 12));
         final list = models.map((m) => m.toEntity()).toList();
-        if (list.isNotEmpty) return list;
+        final safeList = SafeContentFilter.filterWallpapers(list);
+        if (safeList.isNotEmpty) return safeList;
       } catch (_) {
         // Fallback to Pixabay if Unsplash fails
       }
       try {
         final models = await pixabayRemoteDataSource
             .searchPhotos(
-              query: query,
+              query: safeQuery,
               page: page,
               orderBy: orderBy,
               orientation: orientation,
               color: color,
             )
             .timeout(const Duration(seconds: 12));
-        return models.map((m) => m.toEntity()).toList();
+        return SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
@@ -190,7 +195,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
       try {
         final models = await pixabayRemoteDataSource
             .searchPhotos(
-              query: query,
+              query: safeQuery,
               page: page,
               orderBy: orderBy,
               orientation: orientation,
@@ -198,21 +203,22 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
             )
             .timeout(const Duration(seconds: 12));
         final list = models.map((m) => m.toEntity()).toList();
-        if (list.isNotEmpty) return list;
+        final safeList = SafeContentFilter.filterWallpapers(list);
+        if (safeList.isNotEmpty) return safeList;
       } catch (_) {
         // Fallback to Unsplash if Pixabay fails
       }
       try {
         final models = await unsplashRemoteDataSource
             .searchPhotos(
-              query: query,
+              query: safeQuery,
               page: page,
               orderBy: orderBy,
               orientation: orientation,
               color: color,
             )
             .timeout(const Duration(seconds: 12));
-        return models.map((m) => m.toEntity()).toList();
+        return SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
       } catch (e) {
         throw ServerFailure(message: e.toString());
       }
@@ -228,14 +234,14 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
         try {
           final models = await unsplashRemoteDataSource
               .searchPhotos(
-                query: query,
+                query: safeQuery,
                 page: page,
                 orderBy: orderBy,
                 orientation: orientation,
                 color: color,
               )
               .timeout(const Duration(seconds: 12));
-          unsplashResults = models.map((m) => m.toEntity()).toList();
+          unsplashResults = SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
         } catch (e) {
           lastError = e;
         }
@@ -244,14 +250,14 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
         try {
           final models = await pixabayRemoteDataSource
               .searchPhotos(
-                query: query,
+                query: safeQuery,
                 page: page,
                 orderBy: orderBy,
                 orientation: orientation,
                 color: color,
               )
               .timeout(const Duration(seconds: 12));
-          pixabayResults = models.map((m) => m.toEntity()).toList();
+          pixabayResults = SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
         } catch (e) {
           lastError = e;
         }
@@ -292,7 +298,7 @@ class WallpaperRepositoryImpl implements WallpaperRepository {
         page: page,
         orientation: orientation,
       );
-      return models.map((m) => m.toEntity()).toList();
+      return SafeContentFilter.filterWallpapers(models.map((m) => m.toEntity()).toList());
     } catch (e) {
       throw ServerFailure(message: e.toString());
     }

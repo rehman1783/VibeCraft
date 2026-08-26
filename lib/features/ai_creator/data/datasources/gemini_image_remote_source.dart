@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/utils/content_safety_filter.dart';
 
 abstract class GeminiImageRemoteDataSource {
   Future<String> generateWallpaperImage({
@@ -21,6 +22,7 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
     required String prompt,
     String? style,
   }) async {
+    final sanitizedPrompt = SafeContentFilter.sanitizeAiPrompt(prompt);
     final apiKey = AppConfig.geminiApiKey;
     final apiVersion = AppConfig.geminiApiVersion;
     final imageModel = AppConfig.geminiImageModel;
@@ -34,7 +36,7 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
         imagenUrl,
         data: {
           "instances": [
-            {"prompt": prompt}
+            {"prompt": sanitizedPrompt}
           ],
           "parameters": {
             "sampleCount": 1,
@@ -88,13 +90,13 @@ class GeminiImageRemoteDataSourceImpl implements GeminiImageRemoteDataSource {
     }
 
     final seed = DateTime.now().millisecondsSinceEpoch % 999999;
-    final encodedPrompt = Uri.encodeComponent(prompt);
+    final encodedPrompt = Uri.encodeComponent(sanitizedPrompt);
 
-    // Candidates prioritized by fidelity and speed
+    // Candidates prioritized by fidelity, safety, and speed
     final candidateEndpoints = [
-      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&seed=$seed&model=$primaryModel',
-      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&seed=${seed + 7}&model=flux',
-      'https://image.pollinations.ai/prompt/$encodedPrompt?width=720&height=1280&nologo=true&seed=${seed + 13}&model=turbo',
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&safe=true&seed=$seed&model=$primaryModel',
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=1080&height=1920&nologo=true&safe=true&seed=${seed + 7}&model=flux',
+      'https://image.pollinations.ai/prompt/$encodedPrompt?width=720&height=1280&nologo=true&safe=true&seed=${seed + 13}&model=turbo',
     ];
 
     final tempDir = await getTemporaryDirectory();

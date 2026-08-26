@@ -51,6 +51,7 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
         'page': page,
         'per_page': perPage,
         'orientation': 'portrait',
+        'content_filter': 'high',
       };
       if (orderBy != null && orderBy.isNotEmpty) {
         queryParams['order_by'] = orderBy;
@@ -93,6 +94,7 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
         'orientation': (orientation != null && orientation.isNotEmpty)
             ? orientation
             : 'portrait',
+        'content_filter': 'high',
       };
       if (orderBy != null && orderBy.isNotEmpty) {
         queryParams['order_by'] = orderBy;
@@ -166,6 +168,7 @@ class UnsplashRemoteDataSourceImpl implements UnsplashRemoteDataSource {
         'orientation': (orientation != null && orientation.isNotEmpty)
             ? orientation
             : 'portrait',
+        'content_filter': 'high',
       };
 
       final response = await dio.get(

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/utils/content_safety_filter.dart';
 import '../../domain/entities/wallpaper_entity.dart';
 import '../../domain/repositories/wallpaper_repository.dart';
 import '../../../search/data/datasources/search_local_data_source.dart';
@@ -158,6 +159,9 @@ class WallpaperCubit extends Cubit<WallpaperState> {
         }
       }
 
+      // Strict safety and content filtration: Discard any offensive/NSFW items
+      newWallpapers = SafeContentFilter.filterWallpapers(newWallpapers);
+
       // Strict vertical mobile wallpaper filter: Discard non-portrait wallpapers
       newWallpapers = newWallpapers.where((w) {
         if (w.width != null && w.height != null && w.width! > 0 && w.height! > 0) {
@@ -243,9 +247,15 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     if (trimmed.isEmpty) {
       emit(state.copyWith(clearQuery: true));
     } else {
-      await searchLocalDataSource.saveSearchQuery(trimmed);
-      await loadRecentSearches();
-      emit(state.copyWith(currentQuery: trimmed, clearCategory: true));
+      if (SafeContentFilter.isQueryBlocked(trimmed)) {
+        // Neutralize sensitive query without saving to search history
+        final safeQuery = SafeContentFilter.sanitizeSearchQuery(trimmed);
+        emit(state.copyWith(currentQuery: safeQuery, clearCategory: true));
+      } else {
+        await searchLocalDataSource.saveSearchQuery(trimmed);
+        await loadRecentSearches();
+        emit(state.copyWith(currentQuery: trimmed, clearCategory: true));
+      }
     }
     await fetchWallpapers(isRefresh: true);
   }

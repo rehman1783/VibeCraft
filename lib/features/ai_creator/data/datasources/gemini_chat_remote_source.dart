@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/utils/content_safety_filter.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
 abstract class GeminiChatRemoteDataSource {
@@ -23,7 +24,10 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
       "Listen carefully to their ideas, recommend inspiring aesthetic directions (e.g. Cyberpunk Neon, "
       "AMOLED Dark Fantasy, Anime Studio, Minimalist 3D, Bioluminescent Nature, Retro Synthwave), "
       "discuss lighting, mood, color palettes, and composition. "
-      "Maintain full context memory of all previous messages.";
+      "Maintain full context memory of all previous messages. "
+      "Strict Content Policy: You MUST only create 100% clean, family-friendly, SFW, aesthetic mobile wallpapers. "
+      "Do NOT assist with any sexual, NSFW, nudity, violence, gore, or offensive concepts. "
+      "Always pivot any inappropriate requests into majestic, wholesome, and artistic wallpaper themes.";
 
   GeminiChatRemoteDataSourceImpl({Dio? dio}) : dio = dio ?? Dio();
 
@@ -36,6 +40,8 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
     final apiVersion = AppConfig.geminiApiVersion;
     final modelVersion = AppConfig.geminiModelVersion;
     final baseUrl = AppConfig.geminiBaseUrl;
+
+    final sanitizedPrompt = SafeContentFilter.sanitizeAiPrompt(prompt);
 
     final styleDirective = (style != null && style.trim().isNotEmpty)
         ? 'Incorporate the visual style: "$style". '
@@ -50,8 +56,9 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
         "1. Understand the core subject and intent precisely (translate any non-English concepts into vivid visual English).\n"
         "2. Add composition details optimized for mobile screens (centered subject, balanced framing, clear top/bottom negative space).\n"
         "3. Specify cinematic lighting, volumetric atmospheric mood, reflections, and rich color palette.\n"
-        "4. Include high-quality aesthetic tags (e.g., 8k resolution, vertical mobile wallpaper, octane render, masterpiece, intricate detail).\n"
-        "5. Output ONLY the finalized prompt text. No explanations, no quotes, no markdown headers, no conversational filler.";
+        "4. Include high-quality aesthetic tags (e.g., 8k resolution, vertical mobile wallpaper, octane render, masterpiece, intricate detail, clean SFW art).\n"
+        "5. Strict Safety Policy: Absolutely NO sexual, nudity, NSFW, gore, or offensive imagery. Enforce 100% family-friendly mobile wallpaper aesthetics.\n"
+        "6. Output ONLY the finalized prompt text. No explanations, no quotes, no markdown headers, no conversational filler.";
 
     try {
       final url =
@@ -66,7 +73,7 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
               "parts": [
                 {
                   "text":
-                      "$optimizationInstruction\n\nUser's raw command: \"$prompt\""
+                      "$optimizationInstruction\n\nUser's raw command: \"$sanitizedPrompt\""
                 }
               ]
             }
@@ -106,7 +113,7 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
       // Fallback handled below
     }
 
-    return _buildLocalMasterPrompt(prompt, style: style);
+    return _buildLocalMasterPrompt(sanitizedPrompt, style: style);
   }
 
   String _buildLocalMasterPrompt(String rawPrompt, {String? style}) {
@@ -174,7 +181,7 @@ class GeminiChatRemoteDataSourceImpl implements GeminiChatRemoteDataSource {
       }
     }
 
-    return '$cleaned, $styleModifier 8k resolution, vertical 9:16 mobile wallpaper, masterpiece, intricate details, cinematic dramatic volumetric lighting, photorealistic rendering';
+    return '$cleaned, $styleModifier 8k resolution, vertical 9:16 mobile wallpaper, masterpiece, intricate details, cinematic dramatic volumetric lighting, photorealistic rendering, family-friendly, clean SFW art';
   }
 
   @override

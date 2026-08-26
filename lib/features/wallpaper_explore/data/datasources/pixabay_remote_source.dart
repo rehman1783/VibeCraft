@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/errors/exceptions.dart';
+import '../../../../core/utils/content_safety_filter.dart';
 import '../models/pixabay_wallpaper_model.dart';
 
 abstract class PixabayRemoteDataSource {
@@ -132,7 +133,8 @@ class PixabayRemoteDataSourceImpl implements PixabayRemoteDataSource {
     String? category,
   }) async {
     try {
-      final effectiveQuery = query.trim().isNotEmpty ? query.trim() : 'wallpapers';
+      final safeQuery = SafeContentFilter.sanitizeSearchQuery(query);
+      final effectiveQuery = safeQuery.isNotEmpty ? safeQuery : 'wallpapers';
       final mappedOrientation = _mapOrientation(orientation);
       final mappedColor = _mapColor(color);
       final mappedOrder = _mapOrder(orderBy);
