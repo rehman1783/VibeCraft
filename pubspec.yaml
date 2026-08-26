@@ -48,7 +48,6 @@ dependencies:
 
   # Environment & Utilities
   flutter_dotenv: ^5.1.0
-  gal: ^2.3.0
 
   # Backend Services
   firebase_core: ^3.0.0

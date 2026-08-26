@@ -16,13 +16,16 @@ import 'package:vibe_craft/features/navigation/presentation/cubit/navigation_cub
 import 'package:vibe_craft/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:vibe_craft/features/wallpaper_explore/domain/repositories/wallpaper_repository.dart';
 import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
+import 'package:vibe_craft/firebase_options.dart';
 import 'package:vibe_craft/injection_container.dart';
 import 'package:vibe_craft/routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = true;
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Initialize Unsplash API & clean architecture dependencies
   await initDependencyInjection();

@@ -35,7 +35,7 @@ class ProfileMenuTile extends StatelessWidget {
         : (iconColor ?? AppColors.primary);
 
     final tileBackground = isDark
-        ? AppColors.surface.withOpacity(0.5)
+        ? AppColors.surface.withValues(alpha: 0.5)
         : AppColors.lightSurface;
 
     final titleColor = isDestructive
@@ -62,7 +62,9 @@ class ProfileMenuTile extends StatelessWidget {
               color: tileBackground,
               border: isDark
                   ? null
-                  : Border.all(color: AppColors.lightBorder.withOpacity(0.6)),
+                  : Border.all(
+                      color: AppColors.lightBorder.withValues(alpha: 0.6),
+                    ),
             ),
             child: Row(
               children: [
@@ -72,7 +74,7 @@ class ProfileMenuTile extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                   ),
                   child: Icon(leadingIcon, color: color, size: 20),
                 ),

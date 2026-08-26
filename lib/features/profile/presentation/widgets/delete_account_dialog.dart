@@ -27,7 +27,7 @@ class DeleteAccountDialog extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.secondary.withOpacity(0.15),
+              color: AppColors.secondary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(

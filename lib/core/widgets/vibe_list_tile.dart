@@ -27,7 +27,7 @@ class VibeListTile extends StatelessWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.4),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
       ),
       child: ListTile(
@@ -37,7 +37,7 @@ class VibeListTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(leadingIcon, color: theme.colorScheme.primary),
@@ -52,14 +52,14 @@ class VibeListTile extends StatelessWidget {
             ? Text(
                 subtitle!,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               )
             : null,
         trailing: trailing ?? Icon(
           Icons.arrow_forward_ios_rounded,
           size: 16,
-          color: theme.colorScheme.onSurface.withOpacity(0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
       ),
     );

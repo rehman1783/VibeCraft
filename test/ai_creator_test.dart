@@ -19,6 +19,14 @@ class MockAiRepository implements AiRepository {
   }
 
   @override
+  Future<String> optimizePrompt({
+    required String prompt,
+    String? style,
+  }) async {
+    return 'Optimized: $prompt';
+  }
+
+  @override
   Future<String> generateWallpaper({
     required String prompt,
     String? style,

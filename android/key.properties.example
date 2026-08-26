@@ -1,0 +1,9 @@
+# Key properties template for signing production release builds for Google Play Console.
+# Copy this file to `android/key.properties` and fill in your actual keystore details.
+#
+# DO NOT commit `key.properties` or your `.jks`/`.keystore` file to version control!
+
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=YOUR_KEY_ALIAS
+storeFile=C:\\path\\to\\your\\upload-keystore.jks
