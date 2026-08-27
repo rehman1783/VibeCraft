@@ -22,6 +22,22 @@
           }
         },
         {
+          "client_id": "197785385774-keu59kvkiub7bd1d889bq0fif32t2c6a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vibecraft.app",
+            "certificate_hash": "2c7ce051e48d824ceffbeacba3dea2530048e133"
+          }
+        },
+        {
+          "client_id": "197785385774-s774koba7ugvkgj6vjfe4h73d65mohmc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vibecraft.app",
+            "certificate_hash": "a9cd08061a6011d3b353a655eb76983314de7581"
+          }
+        },
+        {
           "client_id": "197785385774-t4g40o0ik12larhb7nq1tfpnkubsghri.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
