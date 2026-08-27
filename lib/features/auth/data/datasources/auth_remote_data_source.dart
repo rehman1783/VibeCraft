@@ -93,7 +93,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> signInWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId:
+          '197785385774-ph777n6rkp2fhb6kcdj51mpb2r01clko.apps.googleusercontent.com',
+      scopes: ['email', 'profile'],
+    );
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
     if (googleUser == null) {

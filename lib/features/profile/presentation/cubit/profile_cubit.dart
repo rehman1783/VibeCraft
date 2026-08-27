@@ -214,7 +214,11 @@ class ProfileCubit extends Cubit<ProfileState> {
       // 1. Handle Re-authentication based on user's selected choice
       if (useGoogle) {
         try {
-          final GoogleSignIn googleSignIn = GoogleSignIn();
+          final GoogleSignIn googleSignIn = GoogleSignIn(
+            serverClientId:
+                '197785385774-ph777n6rkp2fhb6kcdj51mpb2r01clko.apps.googleusercontent.com',
+            scopes: ['email', 'profile'],
+          );
           final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
           if (googleUser == null) {
             emit(const ProfileError('Google re-authentication was cancelled.'));
