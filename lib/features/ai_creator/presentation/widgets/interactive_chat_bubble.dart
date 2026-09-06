@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/services/content_report_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/report_content_bottom_sheet.dart';
+import '../../../../injection_container.dart';
 import '../../../wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
 import '../../domain/entities/chat_message_entity.dart';
 
-class InteractiveChatBubble extends StatelessWidget {
+class InteractiveChatBubble extends StatefulWidget {
   final ChatMessageEntity message;
   final Function(String) onGenerateTap;
   final Function(String)? onStyleTap;
@@ -18,11 +21,113 @@ class InteractiveChatBubble extends StatelessWidget {
   });
 
   @override
+  State<InteractiveChatBubble> createState() => _InteractiveChatBubbleState();
+}
+
+class _InteractiveChatBubbleState extends State<InteractiveChatBubble> {
+  bool _isReported = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkReportedStatus();
+  }
+
+  void _checkReportedStatus() {
+    final msg = widget.message;
+    final contentId = msg.id ??
+        'msg_${msg.timestamp?.millisecondsSinceEpoch ?? msg.text.hashCode}';
+    final service = sl<ContentReportService>();
+    if (service.isContentReported(contentId)) {
+      _isReported = true;
+    }
+  }
+
+  void _onReportMessage(BuildContext context) {
+    final msg = widget.message;
+    final contentId = msg.id ??
+        'msg_${msg.timestamp?.millisecondsSinceEpoch ?? msg.text.hashCode}';
+
+    ReportContentBottomSheet.show(
+      context: context,
+      contentId: contentId,
+      contentType: 'ai_chat_response',
+      contentUrlOrText: msg.text,
+      onReportSubmitted: () {
+        if (mounted) {
+          setState(() {
+            _isReported = true;
+          });
+        }
+      },
+    );
+  }
+
+  void _onReportImage(BuildContext context) {
+    final msg = widget.message;
+    final contentId = msg.wallpaper?.id ??
+        'ai_img_${msg.timestamp?.millisecondsSinceEpoch ?? msg.imagePathOrUrl.hashCode}';
+
+    ReportContentBottomSheet.show(
+      context: context,
+      contentId: contentId,
+      contentType: 'ai_generated_wallpaper',
+      contentUrlOrText: msg.imagePathOrUrl ?? '',
+      contentPreviewImage: msg.imagePathOrUrl,
+      onReportSubmitted: () {
+        if (mounted) {
+          setState(() {
+            _isReported = true;
+          });
+        }
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final message = widget.message;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     final isUser = message.isUser;
+
+    // If this content was reported, display safety placeholder banner
+    if (_isReported && !isUser) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.redAccent.withValues(alpha: 0.3),
+            ),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.shield_outlined,
+                color: Colors.redAccent,
+                size: 16,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'AI content reported & hidden from view',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final assistantBubbleBg =
         isDark ? const Color(0xFF161824) : AppColors.lightSurface;
@@ -82,21 +187,56 @@ class InteractiveChatBubble extends StatelessWidget {
               children: [
                 if (!isUser) ...[
                   Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.auto_awesome,
-                        color: AppColors.primary,
-                        size: 14,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome,
+                            color: AppColors.primary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'VibeCraft AI',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11.5,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'VibeCraft AI',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11.5,
-                          letterSpacing: 0.3,
+                      // Flag/Report button on AI text message
+                      InkWell(
+                        onTap: () => _onReportMessage(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.flag_outlined,
+                                size: 13,
+                                color: isDark ? Colors.white54 : Colors.black45,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Report',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  color: isDark ? Colors.white54 : Colors.black45,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -181,6 +321,49 @@ class InteractiveChatBubble extends StatelessWidget {
                                 ),
                               ),
                             ),
+
+                      // In-App Content Report Button on AI Image Card
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: () => _onReportImage(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.65),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.25),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.flag_outlined,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Report',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Bottom "Tap to View & Apply" overlay
                       Positioned(
                         bottom: 0,
                         left: 0,
@@ -231,7 +414,7 @@ class InteractiveChatBubble extends StatelessWidget {
           if (!isUser &&
               message.suggestedStyles != null &&
               message.suggestedStyles!.isNotEmpty &&
-              onStyleTap != null)
+              widget.onStyleTap != null)
             Padding(
               padding: const EdgeInsets.only(top: 4.0, bottom: 6.0, left: 4.0),
               child: SingleChildScrollView(
@@ -259,7 +442,7 @@ class InteractiveChatBubble extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        onPressed: () => onStyleTap!(style),
+                        onPressed: () => widget.onStyleTap!(style),
                       ),
                     );
                   }).toList(),
@@ -298,7 +481,7 @@ class InteractiveChatBubble extends StatelessWidget {
                       vertical: 10,
                     ),
                   ),
-                  onPressed: () => onGenerateTap(message.optimizedPrompt!),
+                  onPressed: () => widget.onGenerateTap(message.optimizedPrompt!),
                   icon: const Icon(
                     Icons.auto_awesome_rounded,
                     color: Colors.white,
@@ -320,4 +503,3 @@ class InteractiveChatBubble extends StatelessWidget {
     );
   }
 }
-

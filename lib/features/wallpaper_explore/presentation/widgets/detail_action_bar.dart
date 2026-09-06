@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_snackbar.dart';
+import '../../../../core/widgets/report_content_bottom_sheet.dart';
 import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../../favorites/presentation/cubit/favorites_state.dart';
 import '../../domain/entities/wallpaper_entity.dart';
@@ -9,12 +10,14 @@ class DetailActionBar extends StatelessWidget {
   final WallpaperEntity wallpaper;
   final VoidCallback onBackTap;
   final VoidCallback? onPreviewTap;
+  final VoidCallback? onReportTap;
 
   const DetailActionBar({
     super.key,
     required this.wallpaper,
     required this.onBackTap,
     this.onPreviewTap,
+    this.onReportTap,
   });
 
   @override
@@ -82,6 +85,34 @@ class DetailActionBar extends StatelessWidget {
                   ),
                 );
               },
+            ),
+
+            const SizedBox(width: 10),
+
+            // In-App Content Flag / Report Button (Google Play AI Content Policy Compliance)
+            CircleAvatar(
+              backgroundColor: Colors.black.withValues(alpha: 0.5),
+              radius: 20,
+              child: IconButton(
+                tooltip: 'Report Offensive Content',
+                icon: const Icon(
+                  Icons.flag_outlined,
+                  color: Colors.white,
+                  size: 19,
+                ),
+                onPressed: onReportTap ??
+                    () {
+                      ReportContentBottomSheet.show(
+                        context: context,
+                        contentId: wallpaper.id,
+                        contentType: wallpaper.source.toLowerCase().contains('ai')
+                            ? 'ai_generated_wallpaper'
+                            : 'wallpaper',
+                        contentUrlOrText: wallpaper.highResUrl,
+                        contentPreviewImage: wallpaper.thumbnailUrl,
+                      );
+                    },
+              ),
             ),
           ],
         ),

@@ -4,6 +4,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/app_config.dart';
 import 'core/network/network_info.dart';
+import 'core/services/content_report_service.dart';
 import 'core/services/wallpaper_service.dart';
 import 'features/ai_creator/data/datasources/gemini_chat_remote_source.dart';
 import 'features/ai_creator/data/datasources/gemini_image_remote_source.dart';
@@ -48,6 +49,10 @@ Future<void> initDependencyInjection() async {
 
   sl.registerLazySingleton<WallpaperService>(
     () => WallpaperService(),
+  );
+
+  sl.registerLazySingleton<ContentReportService>(
+    () => ContentReportServiceImpl(sharedPreferences: sl<SharedPreferences>()),
   );
 
   // 2. Data Sources

@@ -12,6 +12,7 @@ import '../widgets/detail_action_bar.dart';
 import '../widgets/home_screen_simulator.dart';
 import '../widgets/lock_screen_simulator.dart';
 import '../../../../injection_container.dart';
+import '../../../../core/widgets/report_content_bottom_sheet.dart';
 import '../../domain/repositories/wallpaper_repository.dart';
 
 class WallpaperDetailScreen extends StatefulWidget {
@@ -459,6 +460,22 @@ class _WallpaperDetailScreenState extends State<WallpaperDetailScreen> {
                   onBackTap: () => Navigator.pop(context),
                   onPreviewTap: () =>
                       setState(() => _isPreviewModeActive = true),
+                  onReportTap: () {
+                    ReportContentBottomSheet.show(
+                      context: context,
+                      contentId: widget.wallpaper.id,
+                      contentType: widget.wallpaper.source.toLowerCase().contains('ai')
+                          ? 'ai_generated_wallpaper'
+                          : 'wallpaper',
+                      contentUrlOrText: widget.wallpaper.highResUrl,
+                      contentPreviewImage: widget.wallpaper.thumbnailUrl,
+                      onReportSubmitted: () {
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    );
+                  },
                 ),
               ),
 

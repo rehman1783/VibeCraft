@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
 import 'package:vibe_craft/core/theme/theme_cubit.dart';
 import 'package:vibe_craft/core/utils/app_snackbar.dart';
+import 'package:vibe_craft/core/widgets/report_content_bottom_sheet.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:vibe_craft/features/auth/presentation/cubit/auth_state.dart';
 import 'package:vibe_craft/features/favorites/presentation/cubit/favorites_cubit.dart';
@@ -53,6 +54,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
           context.read<ProfileCubit>().clearCache();
         },
       ),
+    );
+  }
+
+  void _onShowAiSafetyPolicy(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF141624) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(
+            top: BorderSide(
+              color: isDark ? Colors.white12 : Colors.black12,
+            ),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black26,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.shield_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AI Safety & Content Policy',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Google Play Content Moderation Compliance',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 12),
+            const Text(
+              'VibeCraft enforces a zero-tolerance policy against offensive AI content, strictly conforming with Google Play AI-Generated Content guidelines:',
+              style: TextStyle(fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 14),
+            _buildSafetyPoint(
+              Icons.block_rounded,
+              'Prohibited AI Content',
+              'Explicit sexuality (NSFW), hate speech, violence, gore, harassment, and copyright violations are strictly blocked.',
+              isDark,
+            ),
+            const SizedBox(height: 10),
+            _buildSafetyPoint(
+              Icons.flag_outlined,
+              'In-App User Reporting',
+              'You can flag any wallpaper or AI chat generation directly within the app without leaving to external portals.',
+              isDark,
+            ),
+            const SizedBox(height: 10),
+            _buildSafetyPoint(
+              Icons.bolt_rounded,
+              'Fast Human Moderation',
+              'Reports are flagged for review within 24 hours. Offensive outputs are promptly deleted and filters updated.',
+              isDark,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  ReportContentBottomSheet.show(
+                    context: context,
+                    contentId: 'profile_report_${DateTime.now().millisecondsSinceEpoch}',
+                    contentType: 'ai_chat_response',
+                    contentUrlOrText: 'General Safety Report via Profile',
+                  );
+                },
+                icon: const Icon(Icons.flag_rounded, size: 18),
+                label: const Text(
+                  'Report Inappropriate Content',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSafetyPoint(IconData icon, String title, String desc, bool isDark) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: AppColors.primary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                desc,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  height: 1.35,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -198,6 +364,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context,
                         ).pushNamed(AppRoutes.privacyPolicy);
                       },
+                    ),
+                    ProfileMenuTile(
+                      leadingIcon: Icons.shield_outlined,
+                      title: 'AI Safety & Content Policy',
+                      subtitle: 'Content moderation & in-app reporting',
+                      onTap: () => _onShowAiSafetyPolicy(context),
                     ),
                     ProfileMenuTile(
                       leadingIcon: Icons.cleaning_services_outlined,

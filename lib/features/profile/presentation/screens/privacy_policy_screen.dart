@@ -283,6 +283,20 @@ class PrivacyPolicyScreen extends StatelessWidget {
                             subtitleColor: subtitleColor,
                             accentColor: const Color(0xFFE040FB),
                           ),
+                          _buildBulletPoint(
+                            boldTitle: 'In-App Content Flagging & Reporting: ',
+                            bodyText:
+                                'In strict compliance with Google Play AI-Generated Content policies, users can report or flag any offensive AI generation directly in-app without exiting to external services.',
+                            subtitleColor: subtitleColor,
+                            accentColor: const Color(0xFFE040FB),
+                          ),
+                          _buildBulletPoint(
+                            boldTitle: 'Content Moderation & Safety: ',
+                            bodyText:
+                                'All flagged items are queued for human moderation within 24 hours. Offensive, explicit (NSFW), hateful, or violent content is permanently removed.',
+                            subtitleColor: subtitleColor,
+                            accentColor: const Color(0xFFE040FB),
+                          ),
                         ],
                       ),
                     ),

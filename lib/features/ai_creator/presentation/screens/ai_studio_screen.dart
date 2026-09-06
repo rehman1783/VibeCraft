@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/report_content_bottom_sheet.dart';
 import '../../../../core/widgets/vibe_text_field.dart';
 import '../../../wallpaper_explore/presentation/screens/wallpaper_detail_screen.dart';
 import '../cubit/ai_chat_cubit.dart';
@@ -51,6 +52,135 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
     });
   }
 
+  void _showAiSafetyDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF161826) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.shield_rounded,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'AI Safety & Guidelines',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'VibeCraft strictly complies with Google Play AI-Generated Content policies:',
+              style: TextStyle(fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 12),
+            _buildSafetyItem(
+              Icons.check_circle_outline_rounded,
+              'Zero Tolerance for Hate & NSFW',
+              'Harassment, explicit sexual content, violence, and dangerous activities are prohibited.',
+              isDark,
+            ),
+            const SizedBox(height: 8),
+            _buildSafetyItem(
+              Icons.flag_outlined,
+              'In-App Flagging & Reporting',
+              'Tap the Flag/Report button on any AI message or image to report offensive generations immediately.',
+              isDark,
+            ),
+            const SizedBox(height: 8),
+            _buildSafetyItem(
+              Icons.timelapse_rounded,
+              '24-Hour Review & Filtering',
+              'Reports are human-reviewed to update safety filters and ban non-compliant content.',
+              isDark,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ReportContentBottomSheet.show(
+                context: context,
+                contentId:
+                    'ai_studio_general_${DateTime.now().millisecondsSinceEpoch}',
+                contentType: 'ai_chat_response',
+                contentUrlOrText: 'General AI Studio Report',
+              );
+            },
+            child: const Text(
+              'Report an Issue',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Understood'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSafetyItem(
+      IconData icon, String title, String desc, bool isDark) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: AppColors.primary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                desc,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  height: 1.3,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -65,18 +195,31 @@ class _AiStudioScreenState extends State<AiStudioScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.auto_awesome, color: AppColors.primary, size: 20),
-            SizedBox(width: 8),
-            Text(
-              'AI CREATION STUDIO',
-              style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
+            const Icon(Icons.auto_awesome, color: AppColors.primary, size: 18),
+            const SizedBox(width: 8),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'AI CREATION STUDIO',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'AI Safety & Guidelines',
+            icon: const Icon(Icons.shield_outlined, size: 22),
+            onPressed: () => _showAiSafetyDialog(context),
+          ),
           IconButton(
             tooltip: 'Clear History',
             icon: const Icon(Icons.refresh_rounded, size: 22),

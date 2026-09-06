@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vibe_craft/core/theme/app_colors.dart';
 import 'package:vibe_craft/core/utils/app_snackbar.dart';
+import 'package:vibe_craft/core/widgets/report_content_bottom_sheet.dart';
 import 'package:vibe_craft/features/wallpaper_explore/domain/entities/wallpaper_entity.dart';
 import 'package:vibe_craft/features/wallpaper_explore/domain/repositories/wallpaper_repository.dart';
 import 'package:vibe_craft/features/wallpaper_explore/presentation/cubit/wallpaper_cubit.dart';
@@ -277,7 +278,39 @@ class _AiGeneratedWallpaperPreviewDialogState
                       ],
                     ),
                   ),
-                  const SizedBox(width: 40), // Balance top row
+                  // In-App Content Report Button (Google Play AI Policy Compliance)
+                  GestureDetector(
+                    onTap: () {
+                      ReportContentBottomSheet.show(
+                        context: context,
+                        contentId: 'ai_preview_${widget.imageUrl.hashCode}',
+                        contentType: 'ai_generated_wallpaper',
+                        contentUrlOrText: widget.imageUrl,
+                        contentPreviewImage: widget.imageUrl,
+                        onReportSubmitted: () {
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.flag_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
